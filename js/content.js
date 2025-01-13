@@ -69,9 +69,25 @@ var gradescope = true;
 var playing = false;
 var themedAnims = true;
 
+var stats = {
+  total: 0,
+  assignments: 0,
+  quizzes: 0,
+  discussions: 0,
+  other: 0,
+  classroom: 0,
+  gradescope: 0,
+};
+
 /**
- * LOAD SETTINGS
+ * LOAD SETTINGS & STATS
  */
+
+for (const key in stats) {
+  load("stats-" + key, 0, function (value) {
+    stats[key] = value;
+  });
+}
 
 load("enabled", true, function (value) {
   enabled = value;
@@ -333,6 +349,11 @@ async function displayBevo(type, skipAnalytics) {
     if (!skipAnalytics) {
       analyticSend("bevo");
       analyticSend(type);
+
+      stats["total"]++;
+      stats[type]++;
+      save("stats-total", stats["total"]);
+      save("stats-" + type, stats[type]);
     }
   }, 100);
 }

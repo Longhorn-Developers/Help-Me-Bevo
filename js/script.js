@@ -1,5 +1,3 @@
-const debug = false;
-
 /**
  * VOLUME
  */
@@ -7,6 +5,7 @@ var slider = document.getElementById("volumeSlider");
 var output = document.getElementById("volumeOutput");
 
 // Should load 0-1
+// We clamp at various lines to assurance. There was a bug where it would be >1 and it was saved into local storage.
 load("volume", function (value) {
   if (value == null) {
     value = 0.5;
@@ -41,7 +40,8 @@ load("enabled", function (value) {
     value = true;
   }
 
-  if (debug) sendMessage(["print", value]);
+  // sendMessage(["print", value]);
+
   enabled = value;
 
   updateToggle();
@@ -101,85 +101,80 @@ sliders.forEach((settingSlider) => {
   });
 });
 
-load("assignments", function (value) {
-  if (value == null) {
-    value = true;
+initSetting("assignments", true, assignmentSlider);
+initSetting("quizzes", false, quizzesSlider);
+initSetting("discussions", true, discussionsSlider);
+initSetting("other", true, otherSlider);
+initSetting("fullScreen", true, fullScreenSlider);
+initSetting("classroom", true, classroomSlider);
+initSetting("gradescope", true, gradescopeSlider);
+initSetting("themedAnims", true, themedSlider);
 
-    save("assignments", true);
+function initSetting(key, defaultValue, slider) {
+  load(key, function (value) {
+    if (value == null) {
+      value = defaultValue;
+      save(key, value);
+    }
+
+    updateSlider(slider, value);
+  });
+}
+
+/**
+ * STATS
+ */
+
+const validStats = [
+  "total",
+  "assignments",
+  "quizzes",
+  "discussions",
+  "other",
+  "classroom",
+  "gradescope",
+];
+
+function loadStats(type, element) {
+  load(type, function (value) {
+    if (value == null || typeof value != "number") {
+      value = 0;
+      save(type, value);
+    }
+
+    element.innerHTML = value;
+  });
+}
+
+for (const stat of validStats) {
+  const element = document.getElementById("stats-" + stat);
+  loadStats("stats-" + stat, element);
+}
+
+document.getElementById("version").innerHTML =
+  chrome.runtime.getManifest().version;
+
+var resetButton = document.getElementById("resetstats");
+var resetConfirm;
+resetButton.addEventListener("click", () => {
+  if (!resetConfirm) {
+    resetConfirm = true;
+    resetButton.innerHTML = "Are you sure?";
+    setTimeout(() => {
+      resetConfirm = false;
+      resetButton.innerHTML = "Reset Stats";
+    }, 3000);
+  } else {
+    for (const stat of validStats) {
+      save("stats-" + stat, 0);
+      document.getElementById("stats-" + stat).innerHTML = 0;
+    }
+
+    resetConfirm = false;
+    resetButton.innerHTML = "Reset Stats";
   }
-
-  updateSlider(assignmentSlider, value);
 });
 
-load("quizzes", function (value) {
-  if (value == null) {
-    value = false;
-
-    save("quizzes", false);
-  }
-
-  updateSlider(quizzesSlider, value);
-});
-
-load("discussions", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("discussions", true);
-  }
-
-  updateSlider(discussionsSlider, value);
-});
-
-load("other", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("other", true);
-  }
-
-  updateSlider(otherSlider, value);
-});
-
-load("fullScreen", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("fullScreen", true);
-  }
-
-  updateSlider(fullScreenSlider, value);
-});
-
-load("classroom", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("classroom", true);
-  }
-
-  updateSlider(classroomSlider, value);
-});
-
-load("gradescope", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("gradescope", true);
-  }
-
-  updateSlider(gradescopeSlider, value);
-});
-
-load("themedAnims", function (value) {
-  if (value == null) {
-    value = true;
-
-    save("themedAnims", true);
-  }
-
-  updateSlider(themedSlider, value);
-});
 /**
  * OTHER
  */
@@ -202,29 +197,67 @@ fetch(staticUrl)
   });
 
 /**
- * EXTENSIONS
+ * WINDOWS
+ */
+
+let menuOpen = false;
+
+function animate(window, div, fadeIn) {
+  menuOpen = fadeIn;
+
+  if (fadeIn) {
+    main.classList.add("animate-in");
+    main.classList.remove("animate-out");
+    window.classList.remove("animate-out");
+    window.classList.add("animate-in");
+    div.classList.remove("pointer-events-none");
+  } else {
+    main.classList.add("animate-out");
+    main.classList.remove("animate-in");
+    window.classList.remove("animate-in");
+    window.classList.add("animate-out");
+    div.classList.add("pointer-events-none");
+  }
+}
+
+/**
+ * EXTENSION WINDOW
  */
 
 const extensionButton = document.getElementById("extensionbutton");
 const extensionMain = document.getElementById("extensions");
 const extensionDiv = document.getElementById("extensionsdiv");
 const extensionBack = document.getElementById("extensionback");
+
 const main = document.getElementById("main");
 
 extensionButton.addEventListener("click", () => {
-  main.classList.add("animate-in");
-  main.classList.remove("animate-out");
-  extensionMain.classList.remove("animate-out");
-  extensionMain.classList.add("animate-in");
-  extensionDiv.classList.remove("pointer-events-none");
+  if (menuOpen) return;
+
+  animate(extensionMain, extensionDiv, true);
 });
 
 extensionBack.addEventListener("click", () => {
-  main.classList.add("animate-out");
-  main.classList.remove("animate-in");
-  extensionMain.classList.remove("animate-in");
-  extensionMain.classList.add("animate-out");
-  extensionDiv.classList.add("pointer-events-none");
+  animate(extensionMain, extensionDiv, false);
+});
+
+/**
+ * STATS WINDOW
+ */
+
+const statsButton = document.getElementById("statsbutton");
+const statsMain = document.getElementById("stats");
+const statsDiv = document.getElementById("statsdiv");
+const statsBack = document.getElementById("statsback");
+
+statsButton.addEventListener("click", () => {
+  if (menuOpen) return;
+
+  animate(statsMain, statsDiv, true);
+});
+
+statsBack.addEventListener("click", () => {
+  animate(statsMain, statsDiv, false);
 });
 
 /**
@@ -242,6 +275,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
 }
 
+// Enables/disables the extension, updating the button and content.js script
 function updateToggle() {
   toggleButton.innerHTML = enabled ? "ON" : "OFF";
   toggleButton.style.backgroundColor = enabled ? "#22c55e" : "#f87171";
@@ -254,6 +288,7 @@ function updateToggle() {
   sendMessage(["toggle", enabled]);
 }
 
+// Sends a message to content.js to update the video element live
 function sendMessage(message) {
   (async () => {
     try {
@@ -264,7 +299,7 @@ function sendMessage(message) {
 
       await chrome.tabs.sendMessage(tab.id, message);
     } catch (e) {
-      if (debug) sendMessage(["print", "script.js sendMessage error: " + e]);
+      // sendMessage(["print", "script.js sendMessage error: " + e]);
     }
   })();
 }
@@ -275,50 +310,16 @@ function save(key, value) {
   }
 
   chrome.storage.local.set({ [key]: value }).then(() => {
-    if (debug) sendMessage(["print", "Saved " + key + ": " + value]);
+    // sendMessage(["print", "Saved " + key + ": " + value]);
   });
 }
 
 function load(key, callback) {
   chrome.storage.local.get([key]).then((result) => {
-    if (debug) sendMessage(["print", "Value of " + key + " is " + result[key]]);
+    // sendMessage(["print", "Value of " + key + " is " + result[key]]);
 
     value = result[key];
 
     callback(value);
-  });
-}
-
-// Debugging
-if (debug) {
-  const element = document.createElement("div");
-  element.innerHTML = `<button
-      id="play"
-      style="background-color: #ffa600; padding: 10px 10px 10px 10px"
-    >
-      Submit
-    </button>`;
-  document.body.appendChild(element);
-
-  const play = document.getElementById("play");
-
-  play.addEventListener("click", () => {
-    sendMessage(["play"]);
-  });
-
-  // Add Testing Submit Button
-  const addSubmit = document.createElement("div");
-  addSubmit.innerHTML = `<button
-      id="addSubmit"
-      style="padding: 10px 10px 10px 10px"
-    >
-      Add
-    </button>`;
-  document.body.appendChild(addSubmit);
-
-  const addSubmitButton = document.getElementById("addSubmit");
-
-  addSubmitButton.addEventListener("click", () => {
-    sendMessage(["addSubmit"]);
   });
 }

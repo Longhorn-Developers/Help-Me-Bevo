@@ -40,15 +40,18 @@
   border: none;
 }
 
-#extensions {
+#extensions,
+#stats {
   transition: opacity 0.75s ease;
 }
 
-#extensions.animate-in {
+#extensions.animate-in,
+#stats.animate-in {
   opacity: 1;
 }
 
-#extensions.animate-out {
+#extensions.animate-out,
+#stats.animate-out {
   opacity: 0;
 }
 

@@ -39,10 +39,10 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 grid-rows-6 gap-3">
+      <div class="grid grid-cols-2 grid-rows-3 gap-3">
         <div
           id="content"
-          class="grid grid-rows-5 grid-cols-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-3 col-span-1"
+          class="grid grid-rows-5 bg-black/40 place-items-center px-4 py-2 rounded-lg text-xs row-span-3 col-span-1"
         >
           <div class="size-full flex items-center">
             <h2 class="text-left font-extrabold text-lg">Canvas</h2>
@@ -79,7 +79,7 @@
 
         <div
           id="content"
-          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-2 col-start-2 col-end-2"
+          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center px-4 py-3 gap-1.5 rounded-lg row-span-2 col-start-2 col-end-2"
         >
           <div class="size-full flex items-center">
             <h2 class="text-left font-extrabold text-lg">Integrations</h2>
@@ -178,12 +178,20 @@
               </div>
             </div>
 
-            <button
-              id="extensionbutton"
-              class="font-bold px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
-            >
-              More Extensions
-            </button>
+            <div class="grid grid-cols-3 gap-x-1 w-full">
+              <button
+                id="statsbutton"
+                class="font-bold px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+              >
+                Stats
+              </button>
+              <button
+                id="extensionbutton"
+                class="font-bold col-span-2 px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+              >
+                More Extensions
+              </button>
+            </div>
           </div>
         </div>
 
@@ -199,6 +207,96 @@
         </div>
       </div>
     </main>
+
+    <div
+      class="pointer-events-none absolute"
+      id="statsdiv"
+      style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
+    >
+      <main
+        style="z-index: 4"
+        id="stats"
+        class="w-[30rem] animate-out bg-gradient-to-br from-[#361b00] to-slate-950 text-white p-6 items-center justify-center"
+      >
+        <div class="flex justify-between">
+          <div class="space-y-1 flex flex-col w-3/4">
+            <h1 class="text-4xl font-black">
+              Your <span class="text-[#BF5700]">Stats</span>
+            </h1>
+            <p class="opacity-75">See how productive you've been!</p>
+            <br />
+          </div>
+        </div>
+
+        <div
+          class="grid grid-rows-14 grid-cols-1 gap-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-3 col-span-1"
+        >
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-bold">Total Assignments</h3>
+            <p id="stats-total">N/A</p>
+          </div>
+
+          <br />
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-bold">Canvas</h3>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Assignments</h3>
+            <p id="stats-assignments">N/A</p>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Quizzes</h3>
+            <p id="stats-quizzes">N/A</p>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Discussions</h3>
+            <p id="stats-discussions">N/A</p>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Other</h3>
+            <p id="stats-other">N/A</p>
+          </div>
+
+          <br />
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-bold">Integrations</h3>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Gradescope</h3>
+            <p id="stats-gradescope">N/A</p>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Google Classroom</h3>
+            <p id="stats-classroom">N/A</p>
+          </div>
+
+          <br />
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-bold">Other</h3>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <h3 class="font-normal">Version</h3>
+            <p id="version">N/A</p>
+          </div>
+        </div>
+
+        <br />
+        <div class="w-full flex justify-between items-center">
+          <button
+            id="statsback"
+            class="text-left px-2 py-1 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+          >
+            Back
+          </button>
+          <button
+            id="resetstats"
+            class="text-right px-2 py-1 bg-[#bf0000] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+          >
+            Reset Stats
+          </button>
+        </div>
+      </main>
+    </div>
 
     <div
       class="pointer-events-none absolute"
@@ -226,7 +324,7 @@
           <div class="size-full flex items-center">
             <h2 class="text-left font-extrabold text-lg">Pet Bevo</h2>
           </div>
-          <p class="opacity-75 text-left">
+          <p class="opacity-75 text-left w-full">
             Let Bevo roam & jump around any website of your choice!
           </p>
           <br />
@@ -245,7 +343,7 @@
               Canvas Strikethrough
             </h2>
           </div>
-          <p class="opacity-75 text-left">
+          <p class="opacity-75 text-left w-full">
             Adds a strikethrough option on answers on Canvas quizzes
           </p>
 
