@@ -57,6 +57,7 @@ function injectVideo() {
 }
 
 var eventButtons = [];
+var blacklisted = ["confirm_unfavorite_course"];
 
 var enabled = true;
 var assignments = true;
@@ -405,7 +406,11 @@ function isValidVideo(url) {
 }
 
 function initButton(button, type) {
-  if (button != null && !eventButtons.includes(button)) {
+  if (
+    button != null &&
+    !eventButtons.includes(button) &&
+    !blacklisted.includes(button.id)
+  ) {
     injectVideo();
 
     eventButtons.push(button);
