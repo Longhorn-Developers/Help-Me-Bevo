@@ -1,8 +1,8 @@
 /**
  * VOLUME
  */
-var slider = document.getElementById("volumeSlider");
-var output = document.getElementById("volumeOutput");
+let slider = document.getElementById("volumeSlider");
+let output = document.getElementById("volumeOutput");
 
 // Should load 0-1
 // We clamp at various lines to assurance. There was a bug where it would be >1 and it was saved into local storage.
@@ -33,8 +33,8 @@ slider.addEventListener("mouseup", function () {
 /**
  * MAIN TOGGLER
  */
-var toggleButton = document.getElementById("toggle");
-var enabled = true;
+let toggleButton = document.getElementById("toggle");
+let enabled = true;
 load("enabled", function (value) {
   if (value == null) {
     value = true;
@@ -154,8 +154,8 @@ for (const stat of validStats) {
 document.getElementById("version").innerHTML =
   chrome.runtime.getManifest().version;
 
-var resetButton = document.getElementById("resetstats");
-var resetConfirm;
+let resetButton = document.getElementById("resetstats");
+let resetConfirm;
 resetButton.addEventListener("click", () => {
   if (!resetConfirm) {
     resetConfirm = true;
@@ -181,6 +181,7 @@ resetButton.addEventListener("click", () => {
 
 const quote = document.getElementById("random-quote");
 const staticUrl = "https://aidenjohnson.dev/Hosts/help-me-bevo-quotes.json";
+let originalQuote = "";
 fetch(staticUrl)
   .then((response) => {
     if (!response.ok) {
@@ -191,10 +192,22 @@ fetch(staticUrl)
   .then((data) => {
     const quotes = data.quotes;
     quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    originalQuote = quote.textContent;
   })
   .catch((error) => {
     console.error("There was a problem with the fetch operation:", error);
   });
+
+// Hover over LHD logo
+const lhdImage = document.getElementById("lhd");
+
+lhdImage.addEventListener("mouseover", () => {
+  quote.textContent = "Longhorn Developers";
+});
+
+lhdImage.addEventListener("mouseout", () => {
+  quote.textContent = originalQuote;
+});
 
 /**
  * WINDOWS

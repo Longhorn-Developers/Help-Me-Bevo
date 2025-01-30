@@ -20,7 +20,7 @@
       <div class="flex justify-between">
         <div class="space-y-1 flex flex-col w-3/4">
           <h1 class="text-4xl font-black">
-            Help Me <span class="text-[#BF5700]">Bevo!</span>
+            Help Me <span class="text-[#BF5700]">Bevo</span>
           </h1>
           <p class="opacity-75">
             Be more motivated to submit assignments with Bevo
@@ -103,7 +103,7 @@
 
         <div
           id="content"
-          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
+          class="grid grid-cols-1 grid-rows-4 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-2 col-start-2 col-end-2"
         >
           <div class="size-full flex">
             <h2 class="text-left font-extrabold text-lg">Display</h2>
@@ -178,16 +178,16 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-x-1 w-full">
+            <div class="grid grid-rows-1 grid-cols-3 gap-y-2 gap-x-1 w-full">
               <button
                 id="statsbutton"
-                class="font-bold px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+                class="font-bold w-full px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
               >
                 Stats
               </button>
               <button
                 id="extensionbutton"
-                class="font-bold col-span-2 px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+                class="font-bold col-span-2 px-2 py-1 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
               >
                 More Extensions
               </button>
@@ -195,15 +195,26 @@
           </div>
         </div>
 
-        <div
-          class="flex items-center justify-center text-center text-xs bg-black/40 p-4 rounded-lg"
-        >
+        <div class="row-span-2 flex items-center justify-center">
           <div
-            class="text-center font-semibold text-[#bf5700]"
-            id="random-quote"
+            class="flex h-full items-center justify-center text-center text-xs bg-black/40 p-2 rounded-lg w-full"
           >
-            Hook 'Em!
+            <div
+              class="text-center font-semibold text-[#bf5700] flex items-center justify-center"
+              id="random-quote"
+            >
+              Hook 'Em!
+            </div>
           </div>
+
+          <a href="https://github.com/longhorn-Developers/" target="_blank">
+            <img
+              src="/Images/LHD.jpeg"
+              alt="Icon"
+              id="lhd"
+              class="ml-2 w-[2.9rem] h-[2.9rem] rounded-md"
+            />
+          </a>
         </div>
       </div>
     </main>

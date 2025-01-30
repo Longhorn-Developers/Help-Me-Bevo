@@ -4,7 +4,7 @@ const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
 
 const name = "Help Me Bevo"; // Name of Extension
 const debug = false;
-var volume = 0.5;
+let volume = 0.5;
 
 // Init Video Element
 const overlayHTML = `
@@ -56,21 +56,21 @@ function injectVideo() {
   console.log("Injected video");
 }
 
-var eventButtons = [];
-var blacklisted = ["confirm_unfavorite_course"];
+let eventButtons = [];
+let blacklisted = ["confirm_unfavorite_course"];
 
-var enabled = true;
-var assignments = true;
-var quizzes = false;
-var discussions = true;
-var other = true;
-var fullScreen = true;
-var classroom = true;
-var gradescope = true;
-var playing = false;
-var themedAnims = true;
+let enabled = true;
+let assignments = true;
+let quizzes = false;
+let discussions = true;
+let other = true;
+let fullScreen = true;
+let classroom = true;
+let gradescope = true;
+let playing = false;
+let themedAnims = true;
 
-var stats = {
+let stats = {
   total: 0,
   assignments: 0,
   quizzes: 0,
@@ -325,7 +325,7 @@ async function displayBevo(type, skipAnalytics) {
 
   video.style.width = fullScreen ? "100%" : "90%";
 
-  var URL = fullScreen ? fullVideoURL : videoURL;
+  let URL = fullScreen ? fullVideoURL : videoURL;
   if (!themedAnims) {
     URL = fullScreen ? fullVideoURL : videoURL;
   } else {
