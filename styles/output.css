@@ -644,16 +644,12 @@ video {
   height: 100%;
 }
 
-.h-\[2\.9rem\] {
-  height: 2.9rem;
+.h-full {
+  height: 100%;
 }
 
 .h-screen {
   height: 100vh;
-}
-
-.h-full {
-  height: 100%;
 }
 
 .w-3\/4 {
@@ -851,24 +847,16 @@ video {
   --tw-gradient-to: #020617 var(--tw-gradient-to-position);
 }
 
+.p-2 {
+  padding: 0.5rem;
+}
+
 .p-4 {
   padding: 1rem;
 }
 
 .p-6 {
   padding: 1.5rem;
-}
-
-.p-3 {
-  padding: 0.75rem;
-}
-
-.p-2 {
-  padding: 0.5rem;
-}
-
-.p-1 {
-  padding: 0.25rem;
 }
 
 .px-2 {
@@ -1155,8 +1143,6 @@ a {
   flex-grow: 1;
 }
 
-/* Credits to W3Schools for the open-source switches */
-
 .switch {
   position: relative;
   display: inline-block;
@@ -1165,15 +1151,11 @@ a {
   margin-right: 10px;
 }
 
-/* Hide default HTML checkbox */
-
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
-
-/* The slider */
 
 .toggleslider {
   position: absolute;
@@ -1208,8 +1190,6 @@ input:focus + .toggleslider {
 input:checked + .toggleslider:before {
   transform: translateX(18px);
 }
-
-/* Rounded sliders */
 
 .toggleslider.round {
   border-radius: 34px;
