@@ -1,14 +1,22 @@
 {
   "name": "help-me-bevo",
-  "version": "1.0.0",
+  "displayName": "Help Me Bevo",
+  "version": "2.0.1",
   "description": "A extension to see the <i>infamous</i> Bevo 3rd down animation when you submit a Canvas assignment!",
+  "homepage": "https://github.com/Longhorn-Developers/Help-Me-Bevo",
   "main": "content.js",
   "scripts": {
     "watch": "npx tailwindcss -i ./styles/input.css -o ./styles/output.css --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "bevo",
+    "canvas",
+    "extension",
+    "ut-austin",
+    "ut"
+  ],
+  "author": "arjohnsonn",
+  "license": "MIT",
   "devDependencies": {
     "tailwindcss": "^3.4.13"
   }
