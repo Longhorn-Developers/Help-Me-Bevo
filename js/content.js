@@ -204,9 +204,6 @@ waitForElm("#submit_quiz_button").then((elm) => {
   initButton(elm, "quizzes");
 });
 
-// Discussions
-// ?
-
 // Dynamically loaded Submit buttons
 const bodyElement = document.body;
 const config = { childList: true, subtree: true };
@@ -463,17 +460,14 @@ function isValidVideo(url) {
     return false;
   }
 
-  // Create a video element to check if the video can be loaded
   const video = document.createElement("video");
   video.src = url;
 
   return new Promise((resolve) => {
-    // Add an event listener for video load success
     video.onloadeddata = () => {
       resolve(true); // Valid video
     };
 
-    // Add an event listener for video load failure
     video.onerror = () => {
       resolve(false); // Invalid video
     };
