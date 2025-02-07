@@ -676,6 +676,18 @@ video {
   width: 100vw;
 }
 
+.w-\[31rem\] {
+  width: 31rem;
+}
+
+.w-\[30\.1rem\] {
+  width: 30.1rem;
+}
+
+.w-\[30\.5rem\] {
+  width: 30.5rem;
+}
+
 .max-w-\[24rem\] {
   max-width: 24rem;
 }
@@ -1041,6 +1053,73 @@ video {
   z-index: 9999;
   opacity: 0;
   transition: opacity 0.25s ease;
+}
+
+#assignmentName {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(1rem, 9vw, 7rem);
+  color: white;
+  -webkit-text-stroke: 5px black;
+  -moz-text-stroke: 5px black;
+  paint-order: stroke fill;
+  text-shadow: 0 0 15px black;
+  text-align: center;
+  z-index: 99;
+  width: 100%;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.shake {
+  animation: shake 0.5s infinite;
+  /* Apply shaking animation */
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  11% {
+    transform: translate(calc(-50% + 3px), calc(-50% + 2px)) rotate(-1deg);
+  }
+
+  22% {
+    transform: translate(calc(-50% - 3px), calc(-50% - 2px)) rotate(1deg);
+  }
+
+  33% {
+    transform: translate(calc(-50% + 2px), calc(-50% - 3px)) rotate(-0.5deg);
+  }
+
+  44% {
+    transform: translate(calc(-50% - 2px), calc(-50% + 3px)) rotate(0.5deg);
+  }
+
+  55% {
+    transform: translate(calc(-50% + 3px), calc(-50% - 2px)) rotate(-1deg);
+  }
+
+  66% {
+    transform: translate(calc(-50% - 3px), calc(-50% + 2px)) rotate(1deg);
+  }
+
+  77% {
+    transform: translate(calc(-50% + 2px), calc(-50% + 3px)) rotate(-0.5deg);
+  }
+
+  88% {
+    transform: translate(calc(-50% - 2px), calc(-50% - 3px)) rotate(0.5deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
 }
 
 .menu-frame {
