@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @link https://utopia.fyi/clamp/calculator?a=320,1200,80—120 */
+
+:root {
+  --fluid-80-120: clamp(2rem, 4.0909rem + 4.5455vw, 7.5rem);
+}
 #video-overlay {
   position: fixed;
   top: 0;
@@ -25,17 +30,24 @@
   transform: translate(-50%, -50%);
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 900;
-  font-size: clamp(1rem, 9vw, 7rem);
+
   color: white;
   -webkit-text-stroke: 5px black;
   -moz-text-stroke: 5px black;
   paint-order: stroke fill;
-  text-shadow: 0 0 15px black;
+  text-shadow: 0 0 15px rgb(12, 12, 12);
   text-align: center;
   z-index: 99;
-  width: 100%;
-  overflow: hidden;
-  line-height: 1;
+  width: 95%;
+
+  /* line-height: 1;
+  font-size: var(--fluid-80-120); */
+  /* overflow: hidden; */
+
+  /* display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3; */
 }
 
 .shake {

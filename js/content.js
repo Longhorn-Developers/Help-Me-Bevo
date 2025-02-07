@@ -4,11 +4,11 @@ const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
 const debug = false;
 let volume = 0.5;
-
+const DEBUG_ASSIGNMENT_NAME = "";
 function generateOverlayHTML() {
   return `
 <div id="video-overlay">
-  <h1 id="assignmentName" class="hidden"></h1>
+  <h1 class="hidden" id="assignmentName" >${DEBUG_ASSIGNMENT_NAME}</h1>
   <video id="video" volume="${volume}" style="width: 100%">
     <source src="${fullVideoURL}" type="video/mp4">
     Your browser does not support the video tag.
@@ -388,6 +388,23 @@ async function displayBevo(type, skipAnalytics) {
       if (curAssignmentName != null) {
         URL = blankVideoURL;
         assignmentNameElement.textContent = curAssignmentName.toUpperCase();
+
+        let fontSizeRem;
+        if (curAssignmentName.length > 70) {
+          fontSizeRem = 5;
+        } else if (curAssignmentName.length > 50) {
+          fontSizeRem = 6;
+        } else if (curAssignmentName.length > 30) {
+          fontSizeRem = 7;
+        }
+
+        if (window.innerWidth < 850) {
+          fontSizeRem /= 2.25;
+        } else if (window.innerWidth < 1350) {
+          fontSizeRem /= 1.5;
+        }
+
+        assignmentNameElement.style.fontSize = `${fontSizeRem}rem`;
       }
     }
 
