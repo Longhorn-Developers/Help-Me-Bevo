@@ -1,27 +1,29 @@
-const videoURL = "https://aidenjohnson.dev/Images/Bevo.mp4";
 const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
 const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
+const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
-const name = "Help Me Bevo"; // Name of Extension
 const debug = false;
 let volume = 0.5;
 
-// Init Video Element
-const overlayHTML = `
-  <div id="video-overlay">
-    <video id="video" volume="${volume}">
-      <source src="${videoURL}" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-      <button class="skip-button" id="skip-button">
-      SKIP
-      </button>
-  </div>
+function generateOverlayHTML() {
+  return `
+<div id="video-overlay">
+  <h1 id="assignmentName" class="hidden"></h1>
+  <video id="video" volume="${volume}" style="width: 100%">
+    <source src="${fullVideoURL}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+    <button class="skip-button" id="skip-button">
+    SKIP
+    </button>
+</div>
 `;
+}
 
 let videoDiv;
 let videoOverlay;
 let video;
+let assignmentNameElement;
 let skip;
 
 let injected = false;
@@ -29,12 +31,13 @@ function injectVideo() {
   if (injected) return;
 
   const overlayElement = document.createElement("div");
-  overlayElement.innerHTML = overlayHTML;
+  overlayElement.innerHTML = generateOverlayHTML();
   document.body.appendChild(overlayElement);
 
   videoDiv = document.getElementById("volumeDiv");
   videoOverlay = document.getElementById("video-overlay");
   video = document.getElementById("video");
+  assignmentNameElement = document.getElementById("assignmentName");
   skip = document.getElementById("skip-button");
 
   video.addEventListener("ended", () => {
@@ -64,11 +67,11 @@ let assignments = true;
 let quizzes = false;
 let discussions = true;
 let other = true;
-let fullScreen = true;
 let classroom = true;
 let gradescope = true;
 let playing = false;
 let themedAnims = true;
+let assignmentName = true;
 
 let stats = {
   total: 0,
@@ -105,15 +108,14 @@ load("discussions", false, function (value) {
 load("other", true, function (value) {
   other = value;
 });
-load("fullScreen", true, function (value) {
-  fullScreen = value;
-});
 // Should load 0-1
 load("volume", null, function (value) {
   if (value == null) {
     value = volume;
     save("volume", volume);
   }
+
+  console.log(value);
 
   value = clamp(value, 0, 1);
 
@@ -143,6 +145,9 @@ load("playing", null, function (value) {
 load("themedAnims", true, function (value) {
   themedAnims = value;
 });
+load("assignmentName", true, function (value) {
+  assignmentName = value;
+});
 
 /**
  * EVENTS & LISTENERS
@@ -157,6 +162,7 @@ const listenerFuncs = {
   changeValue: changeValue,
 };
 
+// If the user hasn't interacted with the page, videos are automatically muted
 document.addEventListener("click", () => {
   if (!playing) return;
 
@@ -171,6 +177,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     listenerFuncs[action](request);
   } else {
     console.log(request);
+  }
+});
+
+// Shortcut for skipping
+document.addEventListener("keydown", (event) => {
+  if (playing && (event.key === "Escape" || event.key === "Backspace")) {
+    video.pause();
+    video.currentTime = 0;
+    videoOverlay.classList.remove("show-bevo");
+    setPlaying(false);
   }
 });
 
@@ -265,9 +281,6 @@ function changeValue(data) {
     case "other":
       other = value;
       break;
-    case "fullScreen":
-      fullScreen = value;
-      break;
     case "classroom":
       classroom = value;
       break;
@@ -277,12 +290,19 @@ function changeValue(data) {
     case "themedAnims":
       themedAnims = value;
       break;
+    case "assignmentName":
+      assignmentName = value;
+      break;
   }
 }
 
-const submitTexts = ["Submit", "Upload"];
+const submitTexts = ["Submit", "Upload", "Submit & View Submission"];
 const classroomText = ["Turn in", "Mark as done"];
-const exceptions = ["Submit file using Canvas Files"];
+const exceptions = [
+  "Submit file using Canvas Files",
+  "Submit PDF",
+  "Submit Images",
+];
 function isSubmitButton(element, isButton, type) {
   if (element.textContent == null || element.id == "submit_quiz_button")
     return false;
@@ -321,27 +341,76 @@ async function displayBevo(type, skipAnalytics) {
   if (type == "discussions" && !discussions) return;
   if (type == "other" && !other) return;
 
-  console.log(type);
+  let curAssignmentName;
+  let titleElement;
+  let titleText;
+  switch (type) {
+    case "assignments":
+      titleElement = document.querySelector('[data-testid="title"]');
+      titleText = titleElement ? titleElement.textContent : null;
 
-  video.style.width = fullScreen ? "100%" : "90%";
+      curAssignmentName = titleText;
+      break;
+    case "quizzes":
+      // First element is an active open quiz, the seocnd one is after the submission when page refreshes
+      titleElement =
+        document.querySelector(".quiz-header h1") ||
+        document.getElementById("quiz_title");
+      titleText = titleElement ? titleElement.textContent : null;
 
-  let URL = fullScreen ? fullVideoURL : videoURL;
-  if (!themedAnims) {
-    URL = fullScreen ? fullVideoURL : videoURL;
-  } else {
+      curAssignmentName = titleText;
+      break;
+    case "discussions":
+      const breadcrumbs = document.querySelector("#breadcrumbs ul");
+      const lastSpan = breadcrumbs.querySelector("li:last-child span");
+
+      titleText = lastSpan.textContent.trim();
+
+      curAssignmentName = text;
+      break;
+    case "gradescope":
+      const h1Element = document.querySelector(
+        "h1.submissionOutlineHeader--assignmentTitle"
+      );
+
+      titleText = h1Element.innerHTML.trim();
+
+      curAssignmentName = titleText;
+      break;
+    default:
+      break;
+  }
+
+  let URL = fullVideoURL;
+  if (themedAnims) {
     const isValid = await isValidVideo(themedVideoURL);
 
     if (isValid) {
       URL = themedVideoURL;
+    } else {
+      if (curAssignmentName != null) {
+        URL = blankVideoURL;
+        assignmentNameElement.textContent = curAssignmentName.toUpperCase();
+      }
     }
 
     console.log("Themed video " + (isValid ? "exists" : "doesn't exist"));
   }
 
   video.src = URL;
+
   video.pause();
 
   setPlaying(true, type);
+  video.volume = volume; // Have to set it like this instead of loading it into the HTML so it works
+
+  if (curAssignmentName != null) {
+    assignmentNameElement.classList.remove("hidden");
+    setTimeout(() => {
+      assignmentNameElement.classList.remove("shake");
+      assignmentNameElement.classList.add("hidden");
+    }, 1250);
+  }
 
   setTimeout(() => {
     videoOverlay.classList.add("show-bevo");
@@ -361,6 +430,12 @@ async function displayBevo(type, skipAnalytics) {
 
 function setPlaying(value, type) {
   playing = value;
+  if (playing) {
+    assignmentNameElement.classList.add("shake");
+  } else {
+    assignmentNameElement.classList.remove("shake");
+    assignmentNameElement.classList.add("hidden");
+  }
 
   save("playing", [Date.now() / 1000, value, type]);
 }

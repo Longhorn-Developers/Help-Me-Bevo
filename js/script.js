@@ -63,20 +63,20 @@ const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
 const discussionsSlider = document.getElementById("discussions");
 const otherSlider = document.getElementById("other");
-const fullScreenSlider = document.getElementById("fullScreen");
 const classroomSlider = document.getElementById("classroom");
 const gradescopeSlider = document.getElementById("gradescope");
 const themedSlider = document.getElementById("themedAnims");
+const assignmentNameSlider = document.getElementById("assignmentName");
 
 const sliderSaveKeys = {
   [assignmentSlider]: "assignments",
   [quizzesSlider]: "quizzes",
   [discussionsSlider]: "discussions",
   [otherSlider]: "other",
-  [fullScreenSlider]: "fullScreen",
   [classroomSlider]: "classroom",
   [gradescopeSlider]: "gradescope",
   [themedSlider]: "themedAnims",
+  [assignmentNameSlider]: "assignmentName",
 };
 
 const sliders = [
@@ -84,10 +84,10 @@ const sliders = [
   quizzesSlider,
   discussionsSlider,
   otherSlider,
-  fullScreenSlider,
   classroomSlider,
   gradescopeSlider,
   themedSlider,
+  assignmentSlider,
 ];
 
 sliders.forEach((settingSlider) => {
@@ -105,10 +105,10 @@ initSetting("assignments", true, assignmentSlider);
 initSetting("quizzes", false, quizzesSlider);
 initSetting("discussions", true, discussionsSlider);
 initSetting("other", true, otherSlider);
-initSetting("fullScreen", true, fullScreenSlider);
 initSetting("classroom", true, classroomSlider);
 initSetting("gradescope", true, gradescopeSlider);
 initSetting("themedAnims", true, themedSlider);
+initSetting("assignmentName", true, assignmentNameSlider);
 
 function initSetting(key, defaultValue, slider) {
   load(key, function (value) {
