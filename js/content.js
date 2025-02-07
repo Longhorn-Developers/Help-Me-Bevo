@@ -115,6 +115,8 @@ load("volume", null, function (value) {
     save("volume", volume);
   }
 
+  console.log(value);
+
   value = clamp(value, 0, 1);
 
   updateVolume([null, value]);
