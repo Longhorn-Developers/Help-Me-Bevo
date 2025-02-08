@@ -14,7 +14,7 @@ function generateOverlayHTML() {
     Your browser does not support the video tag.
   </video>
     <button class="skip-button" id="skip-button">
-    SKIP
+    SKIP ESC
     </button>
 </div>
 `;

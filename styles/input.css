@@ -40,9 +40,9 @@
   z-index: 99;
   width: 95%;
 
-  /* line-height: 1;
-  font-size: var(--fluid-80-120); */
-  /* overflow: hidden; */
+  line-height: 1;
+  font-size: var(--fluid-80-120);
+  overflow: hidden;
 
   /* display: -webkit-box;
   -webkit-box-orient: vertical;
