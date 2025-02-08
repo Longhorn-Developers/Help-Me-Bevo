@@ -400,7 +400,7 @@ async function displayBevo(type, skipAnalytics) {
 
         if (window.innerWidth < 850) {
           fontSizeRem /= 2.25;
-        } else if (window.innerWidth < 1350) {
+        } else if (window.innerWidth < 1300) {
           fontSizeRem /= 1.5;
         }
 
