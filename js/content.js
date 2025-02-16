@@ -72,6 +72,32 @@ let gradescope = true;
 let playing = false;
 let themedAnims = true;
 let assignmentName = true;
+let watchTime = 0;
+
+function getStatsFields() {
+  return {
+    busiestHour: {},
+    busiestDay: {},
+    weekendSubmissions: 0,
+    weekdaySubmissions: 0,
+    courses: {},
+    timeWatched: 0,
+    lastMinuteSubmissions: 0,
+    mostProcrastinatedAssignment: {
+      name: "",
+      timeLeft: -1,
+    },
+    earliestAssignment: {
+      name: "",
+      timeLeft: -1,
+    },
+  };
+}
+
+const SEMESTER = "SPRING_2025";
+let personalStats = {
+  [SEMESTER]: getStatsFields(),
+};
 
 let stats = {
   total: 0,
@@ -95,6 +121,18 @@ for (const key in stats) {
 
 load("enabled", true, function (value) {
   enabled = value;
+});
+load("personalStats", personalStats, function (value) {
+  personalStats = JSON.parse(JSON.stringify(value));
+
+  // Add keys/indexes that may have been added in newer versions
+  const template = getStatsFields();
+  for (const key in template) {
+    if (personalStats[SEMESTER][key] == null) {
+      // Deep copy the value
+      personalStats[SEMESTER][key] = JSON.parse(JSON.stringify(template[key]));
+    }
+  }
 });
 load("assignments", true, function (value) {
   assignments = value;
@@ -155,7 +193,6 @@ load("assignmentName", true, function (value) {
 
 const listenerFuncs = {
   play: displayBevo,
-  print: log,
   updateVolume: updateVolume,
   toggle: toggle,
   addSubmit: addSubmit,
@@ -338,45 +375,7 @@ async function displayBevo(type, skipAnalytics) {
   if (type == "discussions" && !discussions) return;
   if (type == "other" && !other) return;
 
-  let curAssignmentName;
-  let titleElement;
-  let titleText;
-  switch (type) {
-    case "assignments":
-      titleElement = document.querySelector('[data-testid="title"]');
-      titleText = titleElement ? titleElement.textContent : null;
-
-      curAssignmentName = titleText;
-      break;
-    case "quizzes":
-      // First element is an active open quiz, the seocnd one is after the submission when page refreshes
-      titleElement =
-        document.querySelector(".quiz-header h1") ||
-        document.getElementById("quiz_title");
-      titleText = titleElement ? titleElement.textContent : null;
-
-      curAssignmentName = titleText;
-      break;
-    case "discussions":
-      const breadcrumbs = document.querySelector("#breadcrumbs ul");
-      const lastSpan = breadcrumbs.querySelector("li:last-child span");
-
-      titleText = lastSpan.textContent.trim();
-
-      curAssignmentName = text;
-      break;
-    case "gradescope":
-      const h1Element = document.querySelector(
-        "h1.submissionOutlineHeader--assignmentTitle"
-      );
-
-      titleText = h1Element.innerHTML.trim();
-
-      curAssignmentName = titleText;
-      break;
-    default:
-      break;
-  }
+  const curAssignmentName = getAssignmentName(type);
 
   let URL = fullVideoURL;
   if (themedAnims) {
@@ -418,6 +417,10 @@ async function displayBevo(type, skipAnalytics) {
   setPlaying(true, type);
   video.volume = volume; // Have to set it like this instead of loading it into the HTML so it works
 
+  if (!skipAnalytics) {
+    logStatistics(type);
+  }
+
   if (curAssignmentName != null) {
     assignmentNameElement.classList.remove("hidden");
     setTimeout(() => {
@@ -446,16 +449,189 @@ function setPlaying(value, type) {
   playing = value;
   if (playing) {
     assignmentNameElement.classList.add("shake");
+    timeWatched = Date.now() / 1000;
   } else {
     assignmentNameElement.classList.remove("shake");
     assignmentNameElement.classList.add("hidden");
+
+    timeWatched = Date.now() / 1000 - timeWatched;
+    personalStats[SEMESTER].timeWatched += Math.floor(timeWatched + 0.5); // In seconds
+    timeWatched = 0;
+    save("personalStats", personalStats);
+    console.log(personalStats);
   }
 
   save("playing", [Date.now() / 1000, value, type]);
 }
 
-function log(message) {
-  console.log(message[1]);
+// This is for Help Me Bevo wrapped at the end of every semester
+function logStatistics(type) {
+  // Busiest Day
+  const dayOfWeek = new Date().getDay();
+  personalStats[SEMESTER].busiestDay[dayOfWeek] =
+    (personalStats[SEMESTER].busiestDay[dayOfWeek] ?? 0) + 1;
+
+  // Busiest Hour
+  const hour = new Date().getHours();
+  personalStats[SEMESTER].busiestHour[hour] =
+    (personalStats[SEMESTER].busiestHour[hour] ?? 0) + 1;
+
+  // Weekend & Weekday Submissions
+  const day = new Date().getDay();
+  if (day == 0 || day == 6) {
+    personalStats[SEMESTER].weekendSubmissions++;
+  } else {
+    personalStats[SEMESTER].weekdaySubmissions++;
+  }
+
+  // Courses
+  const courseName = getCourseName(type);
+  personalStats[SEMESTER].courses[courseName] =
+    (personalStats[SEMESTER].courses[courseName] ?? 0) + 1;
+
+  // Last Minute Submissions
+  const unixTimestampSeconds = getDueDate(type);
+  if (unixTimestampSeconds) {
+    const timeLeft = unixTimestampSeconds - Math.floor(Date.now() / 1000);
+    if (timeLeft < 30 * 60) {
+      // 30 minutes til due
+      personalStats[SEMESTER].lastMinuteSubmissions++;
+    }
+
+    // Most Procrastinated Assignment
+    const closestTilDue =
+      personalStats[SEMESTER].mostProcrastinatedAssignment.timeLeft;
+    if (
+      closestTilDue == -1 ||
+      timeLeft < personalStats[SEMESTER].mostProcrastinatedAssignment.timeLeft
+    ) {
+      personalStats[SEMESTER].mostProcrastinatedAssignment = {
+        name: getAssignmentName(type),
+        timeLeft: timeLeft,
+      };
+    }
+
+    // Earliest Assignment
+    const earliestTilDue = personalStats[SEMESTER].earliestAssignment.timeLeft;
+    if (
+      earliestTilDue == -1 ||
+      timeLeft > personalStats[SEMESTER].earliestAssignment.timeLeft
+    ) {
+      personalStats[SEMESTER].earliestAssignment = {
+        name: getAssignmentName(type),
+        timeLeft: timeLeft,
+      };
+    }
+  }
+
+  save("personalStats", personalStats);
+  console.log(personalStats);
+}
+
+function getAssignmentName(type) {
+  let titleElement;
+  let titleText;
+
+  switch (type) {
+    case "assignments":
+      titleElement = document.querySelector('[data-testid="title"]');
+      titleText = titleElement ? titleElement.textContent : null;
+
+      return titleText;
+    case "quizzes":
+      // First element is an active open quiz, the seocnd one is after the submission when page refreshes
+      titleElement =
+        document.querySelector(".quiz-header h1") ||
+        document.getElementById("quiz_title");
+      titleText = titleElement ? titleElement.textContent : null;
+
+      return titleText;
+    case "discussions":
+      const breadcrumbs = document.querySelector("#breadcrumbs ul");
+      const lastSpan = breadcrumbs.querySelector("li:last-child span");
+
+      titleText = lastSpan.textContent.trim();
+
+      curAssignmentName = titleText;
+      break;
+    case "gradescope":
+      const h1Element = document.querySelector(
+        "h1.submissionOutlineHeader--assignmentTitle"
+      );
+
+      titleText = h1Element.innerHTML.trim();
+
+      return titleText;
+    default:
+      break;
+  }
+}
+
+function getCourseName(type) {
+  switch (type) {
+    case "quizzes":
+    case "discussions":
+    case "assignments":
+      const courseElement = document.querySelector(
+        'a[href^="/courses/"] span.ellipsible'
+      );
+      const courseText = courseElement?.textContent.trim();
+
+      return courseText;
+    case "gradescope":
+      const courseTitleElement = document.querySelector(
+        "h1.courseHeader--title"
+      );
+      const courseTitle = courseTitleElement?.textContent.trim();
+
+      return courseTitle;
+    default:
+      return;
+  }
+}
+
+function getDueDate(type) {
+  let dueDateElement;
+  let dateTime;
+  let dueDate;
+  let unixTimestampSeconds;
+
+  switch (type) {
+    case "assignments":
+      dueDateElement = document.querySelector('[data-testid="due-date"]');
+
+      if (!dueDateElement) return;
+
+      dateTime = dueDateElement?.getAttribute("datetime");
+      unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
+
+      return unixTimestampSeconds;
+    case "quizzes":
+      dueDateElement = document.querySelector("span.due_at");
+      dueDateText = dueDateElement?.textContent.trim();
+
+      if (!dueDateText || dueDateText == NaN) return;
+
+      unixTimestampSeconds = Math.floor(new Date(dueDateText).getTime() / 1000);
+
+      return unixTimestampSeconds;
+    case "gradescope":
+      dueDateElement = document.querySelector(
+        "div[data-react-class='AssignmentSubmissionViewer']"
+      );
+      if (!dueDateElement) return;
+
+      const dataProps = JSON.parse(
+        dueDateElement.getAttribute("data-react-props")
+      );
+      if (!dataProps) return;
+
+      dateTime = dataProps.assignment.due_date;
+
+      unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
+
+      return unixTimestampSeconds;
+  }
 }
 
 function updateVolume(value) {
