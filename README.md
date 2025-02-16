@@ -11,6 +11,11 @@ Let Bevo take that burden away, and see his infamous 3rd down animation (the OG 
 
 - See the infamous Bevo 3rd down animation every time you submit a Canvas assignment!
 - Automatic Saved Settings
+- Assignment Names over Bevo Rush Animation
+- Stat Tracking
+  - Under the hood, there are even more stats being stored for Help Me Bevo: Wrapped
+- Help Me Bevo: Wrapped
+  - A Spotify Wrapped inspired video that displays the user's submission habits/behaviors at the end of every semester
 - Settings:
   - Enable/Disable Extension
   - Toggle Functionality for:
