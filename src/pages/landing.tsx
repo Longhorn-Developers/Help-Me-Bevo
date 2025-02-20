@@ -1,7 +1,10 @@
 import "../global.css";
 import Bevo from "../../public/images/Bevo.png";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "../global.css";
 
-export default function Landing() {
+function Landing() {
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", background: "black" }}>
       <main className="h-screen w-screen flex flex-col items-center bg-gradient-to-br from-orange-500/20 to-black text-white p-6">
@@ -48,3 +51,9 @@ export default function Landing() {
     </div>
   );
 }
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <Landing />
+  </StrictMode>
+);
