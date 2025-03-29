@@ -57,7 +57,8 @@ These instructions are for installing via the ZIP file from the GitHub release <
 1. Clone the repository.
 2. Run `pnpm install`.
 
-OPTIONAL STEPS:
+### OPTIONAL STEPS:
+
 3. Create a `.env` file in the root directory with the following content:
    ```env
    VITE_API_SECRET=secret_here
