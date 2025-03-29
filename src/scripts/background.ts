@@ -3,14 +3,8 @@ interface SessionData {
   timestamp: number;
 }
 
-// Assuming the manifest has an "env" property with these keys
-const manifestEnv = chrome.runtime.getManifest().env as {
-  measurement_id: string;
-  api_secret: string;
-};
-
-const MEASUREMENT_ID: string = manifestEnv.measurement_id;
-const API_SECRET: string = manifestEnv.api_secret;
+const MEASUREMENT_ID: string = import.meta.env.VITE_MEASUREMENT_ID;
+const API_SECRET: string = import.meta.env.VITE_API_SECRET;
 const GA_ENDPOINT: string = "https://www.google-analytics.com/mp/collect";
 const DEFAULT_ENGAGEMENT_TIME_IN_MSEC: number = 6000;
 const SESSION_EXPIRATION_IN_MIN: number = 5;
@@ -48,7 +42,7 @@ chrome.runtime.onInstalled.addListener(function (
 ) {
   console.log(details.reason);
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-    // send("install");
+    send("install");
     chrome.tabs.create({ url: internalUrl }, function () {
       console.log("Installation detected");
     });
