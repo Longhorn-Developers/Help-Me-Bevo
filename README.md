@@ -52,6 +52,28 @@ These instructions are for installing via the ZIP file from the GitHub release <
 
 <i>Note: These will not receive automatic updates from the Chrome Web Store. It is <b>recommended to download from the web store instead</b> for convenience.</i>
 
+## Setup
+
+1. Clone the repository.
+2. Run `pnpm install`.
+
+OPTIONAL STEPS:
+3. Create a `.env` file in the root directory with the following content:
+   ```env
+   VITE_API_SECRET=secret_here
+   VITE_MEASUREMENT_ID=measurement_id_here
+   ```
+4. Replace both variables with the API Secret and Measurement ID strings given in a Google Analytics data stream/collection.
+
+## Building
+
+1. Run `pnpm run build` to create a build folder.
+2. Load the extension by going to `chrome://extensions` (or whatever your browser uses) and click Load Unpacked and selecting the `build` folder.
+
+## Developing
+
+You don't have to build every time you want to see a change happen. Simply run `pnpm run dev` and the extension popup will be within a webpage hosted locally. Changes will automatically update within the page.
+
 ## Credit
 
 Thank you to the YikYak community for originally suggesting this idea!
