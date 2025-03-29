@@ -12,7 +12,8 @@ dist
 dist.zip
 dist-ssr
 *.local
-public/manifest.json
+.env.*
+.env
 
 # Editor directories and files
 .vscode/*
