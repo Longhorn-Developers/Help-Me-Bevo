@@ -9,7 +9,10 @@ export default function Popup() {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'Poppins', sans-serif", background: "black" }}>
+    <div
+      style={{ fontFamily: "'Poppins', sans-serif", background: "black" }}
+      className="popper"
+    >
       <main
         id="main"
         className="w-[31rem] flex flex-col bg-gradient-to-br from-orange-500/20 to-orange-500/5 text-white p-6 relative"

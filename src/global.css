@@ -158,8 +158,8 @@ html,
   -o-tab-size: 4;
   tab-size: 4;
   /* 3 */
-  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -174,8 +174,12 @@ html,
   2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
   */
 
-body {
+.popper {
   font-family: "Poppins", sans-serif;
+}
+
+body {
+  /* font-family: "Poppins", sans-serif; */
   margin: 0;
   /* 1 */
   line-height: inherit;
