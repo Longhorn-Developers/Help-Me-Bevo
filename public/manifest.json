@@ -1,6 +1,6 @@
 {
   "name": "Help Me Bevo",
-  "version": "3.0.4",
+  "version": "3.1.1",
   "description": "Tired of being demotivated to get assignments done?\n",
   "manifest_version": 3,
   "author": "Aiden Johnson",
@@ -9,7 +9,6 @@
     "default_title": "Help Me Bevo",
     "default_icon": "./icons/icon128.png"
   },
-  "host_permissions": ["https://aidenjohnson.dev/*"],
   "permissions": ["storage"],
   "content_scripts": [
     {
