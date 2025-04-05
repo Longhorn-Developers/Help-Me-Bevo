@@ -1,4 +1,4 @@
-export default function script() {
+export default async function script() {
   /**
    * VOLUME
    */
@@ -183,25 +183,9 @@ export default function script() {
    * OTHER
    */
   const quote = document.getElementById("random-quote") as HTMLElement;
-  const staticUrl: string =
-    "https://aidenjohnson.dev/Hosts/help-me-bevo-quotes.json";
-  let originalQuote = "";
-  fetch(staticUrl)
-    .then((response: Response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok " + response.statusText);
-      }
-      return response.json();
-    })
-    .then((data: { quotes: string[] }) => {
-      const quotes = data.quotes;
-      quote.textContent =
-        quotes[Math.floor(Math.random() * quotes.length)] || "";
-      originalQuote = quote.textContent;
-    })
-    .catch((error: Error) => {
-      console.error("There was a problem with the fetch operation:", error);
-    });
+  const originalQuote: string = await chrome.runtime.sendMessage("quote");
+
+  quote.textContent = originalQuote;
 
   // Hover over LHD logo
   const lhdImage = document.getElementById("lhd") as HTMLElement;

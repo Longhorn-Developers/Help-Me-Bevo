@@ -9,6 +9,9 @@ const GA_ENDPOINT: string = "https://www.google-analytics.com/mp/collect";
 const DEFAULT_ENGAGEMENT_TIME_IN_MSEC: number = 6000;
 const SESSION_EXPIRATION_IN_MIN: number = 5;
 
+const staticUrl: string =
+  "https://aidenjohnson.dev/Hosts/help-me-bevo-quotes.json";
+
 async function send(request: string): Promise<void> {
   fetch(
     `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
@@ -32,8 +35,27 @@ async function send(request: string): Promise<void> {
   });
 }
 
-chrome.runtime.onMessage.addListener(async (request: string) => {
-  send(request);
+// background.ts (fixed)
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  if (request === "quote") {
+    fetch(staticUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        const quotes = data.quotes || [];
+        const selectedQuote =
+          quotes[Math.floor(Math.random() * quotes.length)] ?? "";
+        console.log(selectedQuote);
+        sendResponse(selectedQuote);
+      })
+      .catch((err) => {
+        console.error("Error fetching quotes:", err);
+        sendResponse("");
+      });
+    // Return true to indicate that we will send a response asynchronously
+    return true;
+  } else {
+    send(request);
+  }
 });
 
 const internalUrl: string = chrome.runtime.getURL("../src/html/landing.html");
