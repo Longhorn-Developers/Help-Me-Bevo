@@ -209,7 +209,7 @@ export default function Popup() {
                 className="text-center font-semibold text-[#bf5700] flex items-center justify-center"
                 id="random-quote"
               >
-                Hook 'Em!
+                Hook 'Em
               </div>
             </div>
 
