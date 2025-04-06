@@ -10,7 +10,7 @@ const DEFAULT_ENGAGEMENT_TIME_IN_MSEC: number = 6000;
 const SESSION_EXPIRATION_IN_MIN: number = 5;
 
 const staticUrl: URL = new URL(
-  "https://aidenjohnson.dev/api/help-me-bevo-quotes",
+  "https://www.aidenjohnson.dev/api/help-me-bevo-quotes"
 );
 
 async function send(request: string): Promise<void> {
@@ -31,7 +31,7 @@ async function send(request: string): Promise<void> {
             },
           ],
         }),
-      },
+      }
     );
     console.log(request + " " + response.ok);
   } catch (error) {
@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 const internalUrl: string = chrome.runtime.getURL("../src/html/landing.html");
 chrome.runtime.onInstalled.addListener(function (
-  details: chrome.runtime.InstalledDetails,
+  details: chrome.runtime.InstalledDetails
 ) {
   console.log(details.reason);
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
@@ -116,5 +116,5 @@ async function getOrCreateSessionId(): Promise<string> {
 
 console.log(
   "Vars: " +
-    (MEASUREMENT_ID != null && API_SECRET != null ? "Loaded" : "Not Loaded"),
+    (MEASUREMENT_ID != null && API_SECRET != null ? "Loaded" : "Not Loaded")
 );
