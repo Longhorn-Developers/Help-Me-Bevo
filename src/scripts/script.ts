@@ -185,7 +185,7 @@ export default async function script() {
   const quote = document.getElementById("random-quote") as HTMLElement;
   const originalQuote: string = await chrome.runtime.sendMessage("quote");
 
-  quote.textContent = originalQuote;
+  quote.textContent = originalQuote || "Hook 'Em";
 
   // Hover over LHD logo
   const lhdImage = document.getElementById("lhd") as HTMLElement;

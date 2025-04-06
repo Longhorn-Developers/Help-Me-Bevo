@@ -10,7 +10,7 @@ const DEFAULT_ENGAGEMENT_TIME_IN_MSEC: number = 6000;
 const SESSION_EXPIRATION_IN_MIN: number = 5;
 
 const staticUrl: URL = new URL(
-  "https://aidenjohnson.dev/api/help-me-bevo-quotes"
+  "https://www.aidenjohnson.dev/api/help-me-bevo-quotes"
 );
 
 async function send(request: string): Promise<void> {
