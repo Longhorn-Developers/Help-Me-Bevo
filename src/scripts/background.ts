@@ -9,36 +9,61 @@ const GA_ENDPOINT: string = "https://www.google-analytics.com/mp/collect";
 const DEFAULT_ENGAGEMENT_TIME_IN_MSEC: number = 6000;
 const SESSION_EXPIRATION_IN_MIN: number = 5;
 
+const staticUrl: URL = new URL(
+  "https://aidenjohnson.dev/api/help-me-bevo-quotes",
+);
+
 async function send(request: string): Promise<void> {
-  fetch(
-    `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        client_id: await getOrCreateClientId(),
-        events: [
-          {
-            name: request,
-            params: {
-              session_id: await getOrCreateSessionId(),
-              engagement_time_msec: DEFAULT_ENGAGEMENT_TIME_IN_MSEC,
+  try {
+    const response = await fetch(
+      `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          client_id: await getOrCreateClientId(),
+          events: [
+            {
+              name: request,
+              params: {
+                session_id: await getOrCreateSessionId(),
+                engagement_time_msec: DEFAULT_ENGAGEMENT_TIME_IN_MSEC,
+              },
             },
-          },
-        ],
-      }),
-    }
-  ).then((response: Response) => {
+          ],
+        }),
+      },
+    );
     console.log(request + " " + response.ok);
-  });
+  } catch (error) {
+    console.error(`Error sending ${request}:`, error);
+  }
 }
 
-chrome.runtime.onMessage.addListener(async (request: string) => {
-  send(request);
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  if (request === "quote") {
+    // We still need to use this pattern for Chrome message listeners
+    (async () => {
+      try {
+        const response = await fetch(staticUrl);
+        const data = await response.json();
+
+        sendResponse(data);
+      } catch (err) {
+        console.error("Error fetching quotes:", err);
+        sendResponse("");
+      }
+    })();
+
+    // Return true to indicate that we will send a response asynchronously
+    return true;
+  } else {
+    send(request);
+  }
 });
 
 const internalUrl: string = chrome.runtime.getURL("../src/html/landing.html");
 chrome.runtime.onInstalled.addListener(function (
-  details: chrome.runtime.InstalledDetails
+  details: chrome.runtime.InstalledDetails,
 ) {
   console.log(details.reason);
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
@@ -91,5 +116,5 @@ async function getOrCreateSessionId(): Promise<string> {
 
 console.log(
   "Vars: " +
-    (MEASUREMENT_ID != null && API_SECRET != null ? "Loaded" : "Not Loaded")
+    (MEASUREMENT_ID != null && API_SECRET != null ? "Loaded" : "Not Loaded"),
 );
