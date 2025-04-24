@@ -101,6 +101,8 @@ function Wrapped() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isAutoplay, setIsAutoplay] = useState(true);
 
+  const slideDuration = 8.5;
+
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
@@ -121,55 +123,55 @@ function Wrapped() {
       id: 3,
       videoSrc: "/wrapped/DiamondBlack.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 10,
+      audioStartTime: slideDuration * 1,
     },
     {
       id: 4,
       videoSrc: "/wrapped/DiamondOrange.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 20,
+      audioStartTime: slideDuration * 2,
     },
     {
       id: 5,
       videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 30,
+      audioStartTime: slideDuration * 3,
     },
     {
       id: 6,
       videoSrc: "/wrapped/RibbonOrangeVert.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 40,
+      audioStartTime: slideDuration * 4,
     },
     {
       id: 7,
       videoSrc: "/wrapped/VerticalDiamond.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 50,
+      audioStartTime: slideDuration * 5,
     },
     {
       id: 8,
       videoSrc: "/wrapped/DiamondBlack.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 60,
+      audioStartTime: slideDuration * 6,
     },
     {
       id: 9,
       videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 70,
+      audioStartTime: slideDuration * 7,
     },
     {
       id: 10,
       videoSrc: "/wrapped/RibbonOrangeVert.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 80,
+      audioStartTime: slideDuration * 8,
     },
     {
       id: 11,
       videoSrc: "/wrapped/VerticalDiamond.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 90,
+      audioStartTime: slideDuration * 9,
     },
     {
       id: 12,
