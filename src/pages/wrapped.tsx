@@ -177,8 +177,9 @@ function Wrapped() {
         audioRef.current
           .play()
           .catch((e) => console.error("Audio play error:", e));
-        setIsPlaying(true);
       }
+
+      setIsPlaying(true);
     }
   };
 
@@ -308,7 +309,8 @@ function Wrapped() {
         }
       }
       // Toggle video playback for current slide
-      const currentVideo = videoRefs.current[currentSlide];
+      const idx = currentSlideRef.current; // ← use the ref, not the captured state
+      const currentVideo = videoRefs.current[idx];
       if (currentVideo) {
         if (currentVideo.paused) {
           currentVideo
