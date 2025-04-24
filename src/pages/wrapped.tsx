@@ -1,8 +1,8 @@
+"use client";
+
 import "../global.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-
-("use client");
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,6 +28,61 @@ type Slide = {
   audioStartTime: number;
 };
 
+function getSubtitle(type: string, value: any) {
+  switch (type) {
+    case "busiestHour": {
+      if (value >= 0 && value <= 6) {
+        return "What has you up so late at night?";
+      } else if (value >= 7 && value <= 12) {
+        return "Early bird gets the worm!";
+      } else if (value >= 13 && value <= 18) {
+        return "Afternoon productivity is real";
+      } else if (value >= 19 && value <= 23) {
+        return "Night owl vibes";
+      }
+      break;
+    }
+    case "earliestAssignment": {
+      // value is in hours until due date
+      if (value >= 0 && value <= 6) {
+        return "You need to submit more assignments earlier!";
+      } else if (value >= 24 && value <= 72) {
+        return "Not procrastinating is a great habit!";
+      } else if (value >= 73 && value <= 100000) {
+        return "i need your help with not procrastinating fr";
+      }
+      break;
+    }
+    case "mostProcrastinatedAssignment": {
+      if (value >= 0) {
+        return "At least you submitted it on time!";
+      } else if (value < 0 && value >= -24) {
+        return "At least it isn't a day late. Hope you had a slip day";
+      } else if (value < -24 && value >= -72) {
+        return "Could be worse... I think";
+      } else if (value < -72) {
+        return "I hope that this assignment got credit for being this late";
+      }
+      break;
+    }
+    case "lastMinuteSubmissions": {
+      if (value >= 0 && value <= 5) {
+        return "A couple more buzzer beaters and you'll have the same as Dwayne Wade's game-winning ones";
+      } else if (value == 5) {
+        return "Dwayne Wade had 5 game-winning buzzer beaters";
+      } else if (value > 5 && value < 7) {
+        return "You're getting close to tying Kobe's game-winning buzzer beaters";
+      } else if (value == 8) {
+        return "Kobe Bryant & Lebron had 8 game-winning buzzer beaters";
+      } else if (value == 9) {
+        return "Michael Jordan had 9 game-winning buzzer beaters";
+      } else {
+        return "If these were game-winning buzzer beaters, you'd be the GOAT";
+      }
+    }
+  }
+}
+
 function Wrapped() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const currentSlideRef = useRef<number>(currentSlide);
@@ -46,21 +101,104 @@ function Wrapped() {
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
+      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      textAnimation: "fadeIn",
+      text: "Before we begin:",
+      subtitle:
+        "- This feature was not added until mid semester, so some data may be missing or off. Next semester should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br /><br /><b>Now, let's get started!</b>",
+      audioStartTime: 52,
+    },
+    {
+      id: 2,
       videoSrc: "/wrapped/Intro.mp4",
       textAnimation: "fadeIn",
       audioStartTime: 0,
     },
     {
-      id: 2,
+      id: 3,
       videoSrc: "/wrapped/DiamondBlack.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 15,
+      audioStartTime: 10,
     },
     {
-      id: 3,
+      id: 4,
       videoSrc: "/wrapped/DiamondOrange.mp4",
       textAnimation: "slideUp",
-      audioStartTime: 23,
+      audioStartTime: 20,
+    },
+    {
+      id: 5,
+      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 30,
+    },
+    {
+      id: 6,
+      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 40,
+    },
+    {
+      id: 7,
+      videoSrc: "/wrapped/VerticalDiamond.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 50,
+    },
+    {
+      id: 8,
+      videoSrc: "/wrapped/DiamondBlack.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 60,
+    },
+    {
+      id: 9,
+      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 70,
+    },
+    {
+      id: 10,
+      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 80,
+    },
+    {
+      id: 11,
+      videoSrc: "/wrapped/VerticalDiamond.mp4",
+      textAnimation: "slideUp",
+      audioStartTime: 90,
+    },
+    {
+      id: 12,
+      videoSrc: "/wrapped/BlackOrangeRectangles.mp4",
+      textAnimation: "slideUp",
+      text: "Thanks for using <b>Help Me Bevo</b> this semester!",
+      subtitle: `
+        If you enjoyed Wrapped and the extension, please leave a review! 🧡
+        <br /><br />
+        <a
+          style="
+            font-weight: bold;
+            text-decoration: underline;
+            color: #c77d40;
+          "
+          href="https://chromewebstore.google.com/detail/help-me-bevo/igepffgmogjaehnlpgepliimadegcapd?authuser=1&hl=en"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Click here to leave a rating!
+        </a>
+      `,
+      audioStartTime: 140,
+    },
+    {
+      id: 13,
+      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      textAnimation: "fadeIn",
+      text: "Have a great summer break!",
+      subtitle:
+        "If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!",
+      audioStartTime: 151.5,
     },
   ]);
 
@@ -106,13 +244,181 @@ function Wrapped() {
 
       setSlides((prev) => {
         const updated = [...prev];
-        updated[1] = {
-          ...updated[1],
-          text: `Every day was a fight this semester. You submitted the most assignments on <b>${busiestDayName}!</b>`,
-        };
         updated[2] = {
           ...updated[2],
+          text: `Every day was a fight this semester. You submitted the most assignments on <b>${busiestDayName}!</b>`,
+        };
+        updated[3] = {
+          ...updated[3],
           text: `Most of your assignments were submitted within the hour of <b>${busiestHourLabel}!</b>`,
+          subtitle: getSubtitle("busiestHour", hourNum),
+        };
+        return updated;
+      });
+
+      // get most submitted course
+      const courses = semester.courses as Record<string, number>;
+      const courseEntries = Object.entries(courses).filter(
+        ([name]) => name !== "undefined"
+      ) as [string, number][];
+      const [topCourse, topCount] = courseEntries.length
+        ? courseEntries.reduce((prev, curr) =>
+            curr[1] > prev[1] ? curr : prev
+          )
+        : ["", 0];
+
+      setSlides((prev) => {
+        const updated = [...prev];
+        updated[4] = {
+          ...updated[4],
+          text: `Some classes can be a piece of work. Your most submitted course was <b>${topCourse}</b> with <b>${topCount}</b> submissions!`,
+        };
+        return updated;
+      });
+
+      // get earliest submission. object formatted as { name: string, timeLeft: number (in seconds) }
+      // get earliest submission
+      const earliest = semester.earliestAssignment as {
+        name: string;
+        timeLeft: number;
+      };
+      const cleanName = earliest.name
+        .replace(/[^\x20-\x7E]/g, "") // remove non-keyboard characters
+        .replace(/\n/g, "") // remove newlines
+        .trim(); // trim whitespace
+
+      const totalSeconds = earliest.timeLeft;
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const parts: string[] = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0) parts.push(`${hours}h`);
+      if (minutes > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      const timeLabel = parts.join(" ");
+
+      setSlides((prev) => {
+        const updated = [...prev];
+        updated[5] = {
+          ...updated[5],
+          text: `Procrastination? Never heard of it. Your earliest assignment was <b>${cleanName}</b>, submitted with <b>${timeLabel}</b> to spare!`,
+          subtitle: getSubtitle("earliestAssignment", totalSeconds / 60 / 60),
+        };
+        return updated;
+      });
+
+      // get most procrastinated assignment
+      const procrastinated = semester.mostProcrastinatedAssignment as {
+        name: string;
+        timeLeft: number;
+      };
+      // clean up the name
+      const cleanProcrastinatedName = procrastinated.name
+        .replace(/[^\x20-\x7E]/g, "")
+        .replace(/\n/g, "")
+        .trim();
+
+      const timeLeft = procrastinated.timeLeft;
+      if (timeLeft >= 0) {
+        // on‑time submission
+        const daysP = Math.floor(timeLeft / 86400);
+        const hoursP = Math.floor((timeLeft % 86400) / 3600);
+        const minsP = Math.floor((timeLeft % 3600) / 60);
+        const secsP = timeLeft % 60;
+        const partsP: string[] = [];
+        if (daysP > 0) partsP.push(`${daysP}d`);
+        if (hoursP > 0) partsP.push(`${hoursP}h`);
+        if (minsP > 0) partsP.push(`${minsP}m`);
+        partsP.push(`${secsP}s`);
+        const procrastTimeLabel = partsP.join(" ");
+
+        setSlides((prev) => {
+          const updated = [...prev];
+          updated[6] = {
+            ...updated[6],
+            text: `Procrastination happens sometimes. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted with <b>${procrastTimeLabel}</b> to spare!`,
+            subtitle: getSubtitle(
+              "mostProcrastinatedAssignment",
+              timeLeft / 60 / 60
+            ),
+          };
+          return updated;
+        });
+      } else {
+        // late submission
+        const lateSec = Math.abs(timeLeft);
+        const daysL = Math.floor(lateSec / 86400);
+        const hoursL = Math.floor((lateSec % 86400) / 3600);
+        const minsL = Math.floor((lateSec % 3600) / 60);
+        const secsL = lateSec % 60;
+        const partsL: string[] = [];
+        if (daysL > 0) partsL.push(`${daysL}d`);
+        if (hoursL > 0) partsL.push(`${hoursL}h`);
+        if (minsL > 0) partsL.push(`${minsL}m`);
+        partsL.push(`${secsL}s`);
+        const lateTimeLabel = partsL.join(" ");
+
+        setSlides((prev) => {
+          const updated = [...prev];
+          updated[6] = {
+            ...updated[6],
+            text: `Late work happens to all of us. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted <b>${lateTimeLabel}</b> late!`,
+            subtitle: getSubtitle(
+              "mostProcrastinatedAssignment",
+              -lateSec / 60 / 60
+            ),
+          };
+          return updated;
+        });
+      }
+
+      // last minute submissions
+      const lastMinuteCount = semester.lastMinuteSubmissions as number;
+      setSlides((prev) => {
+        const updated = [...prev];
+        // update the final slide (index 5) with the last-minute submissions count
+        updated[7] = {
+          ...updated[7],
+          text: `We all make buzzer beaters sometimes. You made <b>${lastMinuteCount}</b> last‑minute submission${
+            lastMinuteCount !== 1 ? "s" : ""
+          }.`,
+          subtitle: getSubtitle("lastMinuteSubmissions", lastMinuteCount),
+        };
+        return updated;
+      });
+
+      const weekdaySubmissions = semester.weekdaySubmissions as number;
+      const weekendSubmissions = semester.weekendSubmissions as number;
+
+      setSlides((prev) => {
+        const updated = [...prev];
+        updated[8] = {
+          ...updated[8],
+          text: `Some weeks feel way too long. You submitted <b>${weekdaySubmissions}</b> assignments on school days.`,
+        };
+        updated[9] = {
+          ...updated[9],
+          text: `Even with no school, you displayed hard work. You submitted <b>${weekendSubmissions}</b> assignments on weekends.`,
+        };
+        return updated;
+      });
+
+      // handle total time watched and format to minutes/seconds
+      const timeWatchedSec = semester.timeWatched as number;
+      const mins = Math.floor(timeWatchedSec / 60);
+      const secs = timeWatchedSec % 60;
+      const formattedWatch = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+      setSlides((prev) => {
+        const updated = [...prev];
+        // update the last slide (index 8) or whichever slide you want
+        updated[10] = {
+          ...updated[10],
+          text: `Hopefully you enjoyed seeing Bevo on your screen. You spent <b>${formattedWatch}</b> watching Bevo after submissions!`,
         };
         return updated;
       });
@@ -141,7 +447,7 @@ function Wrapped() {
   // Subtitle animation variants - always fade in but with delay
   const subtitleAnimation = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.8, delay: 0.7 } }, // Delay after main text
+    animate: { opacity: 1, transition: { duration: 0.8, delay: 2 } }, // Delay after main text
   };
 
   // Reset audio to the current slide's start time
@@ -408,7 +714,7 @@ function Wrapped() {
 
                   {slide.subtitle && (
                     <motion.p
-                      className="text-base font-medium text-white/90 max-w-xs drop-shadow-lg"
+                      className="text-base font-normal text-white/90 max-w-xs drop-shadow-lg"
                       initial={subtitleAnimation.initial}
                       animate={subtitleAnimation.animate}
                       key={`subtitle-${slide.id}`}
@@ -451,29 +757,31 @@ function Wrapped() {
         </Button>
 
         {/* Navigation Controls */}
-        <div className="absolute inset-y-0 left-2 flex items-center z-20">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
-            onClick={prevSlide}
-            disabled={currentSlide === 0}
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-        </div>
+        {currentSlide != 0 && (
+          <div className="absolute inset-y-0 left-2 flex items-center z-20">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+              onClick={prevSlide}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+          </div>
+        )}
 
-        <div className="absolute inset-y-0 right-2 flex items-center z-20">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
-            onClick={nextSlide}
-            disabled={currentSlide === slides.length - 1}
-          >
-            <ChevronRight className="h-6 w-6" />
-          </Button>
-        </div>
+        {currentSlide != slides.length - 1 && (
+          <div className="absolute inset-y-0 right-2 flex items-center z-20">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+              onClick={nextSlide}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </Button>
+          </div>
+        )}
 
         {/* Progress Indicators */}
         <div className="absolute top-4 inset-x-4 flex gap-1 z-20">
