@@ -112,7 +112,7 @@ function Wrapped() {
         };
         updated[2] = {
           ...updated[2],
-          text: `Every hour you're awake has potential to a productive hour. For you, most of your assignments were submitted within the hour of <b>${busiestHourLabel}!</b>`,
+          text: `Most of your assignments were submitted within the hour of <b>${busiestHourLabel}!</b>`,
         };
         return updated;
       });
