@@ -13,6 +13,8 @@ import {
   Pause,
   Volume2,
   VolumeOff,
+  Repeat,
+  StepForward,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -97,6 +99,7 @@ function Wrapped() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([null, null, null]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isAutoplay, setIsAutoplay] = useState(true);
 
   const [slides, setSlides] = useState<Slide[]>([
     {
@@ -516,6 +519,10 @@ function Wrapped() {
     }
   };
 
+  const toggleAutoplay = () => {
+    setIsAutoplay(!isAutoplay);
+  };
+
   // Update audio time
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -678,15 +685,23 @@ function Wrapped() {
               muted
               playsInline
               onEnded={() => {
-                const video = videoRefs.current[index];
-                if (video) {
-                  video.currentTime = 0;
-                  video
-                    .play()
-                    .catch((e) => console.error("Video replay error:", e));
-                }
-                if (isPlaying) {
-                  resetAudioToSlideStart();
+                if (isAutoplay) {
+                  if (index === slides.length - 1) {
+                    goToSlide(0);
+                  } else {
+                    nextSlide();
+                  }
+                } else {
+                  const video = videoRefs.current[index];
+                  if (video) {
+                    video.currentTime = 0;
+                    video
+                      .play()
+                      .catch((e) => console.error("Video replay error:", e));
+                  }
+                  if (isPlaying) {
+                    resetAudioToSlideStart();
+                  }
                 }
               }}
             />
@@ -728,33 +743,56 @@ function Wrapped() {
         ))}
 
         {/* Play/Pause Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70 z-30"
-          onClick={togglePlayPause}
-          aria-label={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5" />
-          )}
-        </Button>
+        <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-30">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+            onClick={togglePlayPause}
+            aria-label={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? "Pause playback" : "Play playback"}
+          >
+            {isPlaying ? (
+              <Pause className="h-5 w-5" />
+            ) : (
+              <Play className="h-5 w-5" />
+            )}
+          </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute bottom-4 right-16 h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70 z-30"
-          onClick={toggleMute}
-          aria-label={isPlaying ? "Mute" : "Unmute"}
-        >
-          {isMuted ? (
-            <VolumeOff className="h-5 w-5" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+            onClick={toggleMute}
+            aria-label={isMuted ? "Unmute" : "Mute"}
+            title={isMuted ? "Unmute audio" : "Mute audio"}
+          >
+            {isMuted ? (
+              <VolumeOff className="h-5 w-5" />
+            ) : (
+              <Volume2 className="h-5 w-5" />
+            )}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+            onClick={toggleAutoplay}
+            aria-label={isAutoplay ? "Disable Autoplay" : "Enable Autoplay"}
+            title={
+              isAutoplay
+                ? "Disable autoplay between slides"
+                : "Enable autoplay between slides"
+            }
+          >
+            {isAutoplay ? (
+              <StepForward className="h-5 w-5" />
+            ) : (
+              <Repeat className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
 
         {/* Navigation Controls */}
         {currentSlide != 0 && (
