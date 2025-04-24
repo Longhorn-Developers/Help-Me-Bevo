@@ -3,13 +3,13 @@ const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
 const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
 const debug = false;
-let volume = 0.5;
+let volume = 50;
 const DEBUG_ASSIGNMENT_NAME = "";
 function generateOverlayHTML() {
   return `
 <div id="video-overlay">
   <h1 class="hidden" id="assignmentName" >${DEBUG_ASSIGNMENT_NAME}</h1>
-  <video id="video" volume="${volume}" style="width: 100%">
+  <video id="video" volume="${volume / 100}" style="width: 100%">
     <source src="${fullVideoURL}" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -146,16 +146,17 @@ load("discussions", false, function (value: boolean) {
 load("other", true, function (value: boolean) {
   other = value;
 });
-// Should load 0-1
+
 load("volume", null, function (value: number | null) {
   if (value == null) {
     value = volume;
     save("volume", volume);
   }
 
-  console.log(value);
-
-  value = clamp(value, 0, 1);
+  if (value < 1) {
+    value *= 100;
+    save("volume", Math.floor(value + 0.5));
+  }
 
   updateVolume([null, value]);
 });
@@ -369,10 +370,6 @@ function isSubmitButton(
   return false;
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(value, max));
-}
-
 async function displayBevo(type: string, skipAnalytics: boolean | null) {
   if (!enabled || playing) return;
   if (type == "assignments" && !assignments) return;
@@ -422,7 +419,7 @@ async function displayBevo(type: string, skipAnalytics: boolean | null) {
   video!.pause();
 
   setPlaying(true, type);
-  video!.volume = volume; // Have to set it like this instead of loading it into the HTML so it works
+  video!.volume = volume / 100; // Have to set it like this instead of loading it into the HTML so it works
 
   if (!skipAnalytics) {
     logStatistics(type);
@@ -643,9 +640,11 @@ function getDueDate(type: string) {
 }
 
 function updateVolume(value: [null, number]) {
-  volume = clamp(value[1], 0, 1);
+  console.log(value[1]);
 
-  if (video != null) video.volume = volume;
+  volume = value[1] / 100;
+
+  if (video != null) video.volume = value[1] / 100;
 }
 
 function toggle(value: [null, boolean]) {
@@ -717,10 +716,6 @@ function waitForElm<T extends Element = HTMLElement>(
 }
 
 function save(key: string, value: any) {
-  if (key == "volume" && value > 1) {
-    value = clamp(value / 100, 0, 1);
-  }
-
   chrome.storage.local.set({ [key]: value }).then(() => {
     if (debug) console.log("Saved " + key + ": " + value);
   });
@@ -732,6 +727,8 @@ function load(key: string, defaultValue: any, callback: Function) {
 
     if (value == null) {
       value = defaultValue;
+
+      save(key, value);
     }
 
     callback(value);
