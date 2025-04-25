@@ -194,7 +194,7 @@ function Wrapped() {
           Click here to leave a rating!
         </a>
       `,
-      audioStartTime: 140,
+      audioStartTime: slideDuration * 10,
     },
     {
       id: 13,
@@ -203,7 +203,7 @@ function Wrapped() {
       text: "Have a great summer break!",
       subtitle:
         "If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!",
-      audioStartTime: 151.5,
+      audioStartTime: slideDuration * 11,
     },
   ]);
 
