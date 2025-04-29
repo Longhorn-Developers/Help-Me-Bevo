@@ -56,6 +56,7 @@ export default function Popup() {
   const [resetConfirm, setResetConfirm] = useState(false);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
+  const [showWrapped, setShowWrapped] = useState(false);
   const [quote, setQuote] = useState("Hook 'em");
   let ogQuote = "Hook 'em";
 
@@ -64,6 +65,9 @@ export default function Popup() {
       const _quote = await chrome.runtime.sendMessage("quote");
       setQuote(_quote || "Hook 'em");
       ogQuote = _quote || "Hook 'em";
+
+      const fflags = await chrome.runtime.sendMessage("fflags");
+      setShowWrapped(fflags.Wrapped);
     })();
   }, []);
 
@@ -404,22 +408,24 @@ export default function Popup() {
                 </button>
               </div>
 
-              <button
-                className="
+              {showWrapped && (
+                <button
+                  className="
                   font-bold cursor-pointer col-span-2 w-full px-2 py-1 bg-[#bf5700]
                   rounded-full transform transition-transform duration-200 ease-in-out
                   hover:scale-105 hover:shadow-lg hover:shadow-white/25
                   active:scale-95 active:shadow-sm
                 "
-                onClick={() => {
-                  window.open(
-                    chrome.runtime.getURL("../src/html/wrapped.html"),
-                    "_blank"
-                  );
-                }}
-              >
-                View Wrapped
-              </button>
+                  onClick={() => {
+                    window.open(
+                      chrome.runtime.getURL("../src/html/wrapped.html"),
+                      "_blank"
+                    );
+                  }}
+                >
+                  View Wrapped
+                </button>
+              )}
             </div>
           </div>
 
