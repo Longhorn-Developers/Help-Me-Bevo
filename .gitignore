@@ -9,6 +9,8 @@ lerna-debug.log*
 
 node_modules
 dist
+dist.zip
+dist 2.zip
 dist (old).zip
 dist.zip
 dist-ssr
