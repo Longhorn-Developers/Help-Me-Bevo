@@ -92,8 +92,8 @@ function Wrapped() {
 
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [_audioTime, setAudioTime] = useState(0);
-  const [_audioDuration, setAudioDuration] = useState(0);
+  const [, setAudioTime] = useState(0);
+  const [, setAudioDuration] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([null, null, null]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,7 +109,7 @@ function Wrapped() {
       textAnimation: "fadeIn",
       text: "Before we begin:",
       subtitle:
-        "- This feature was not added until mid semester, so some data may be missing or off. Next semester should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br /><br /><b>Now, let's get started!</b>",
+        "- This feature was not added until mid semester, so some data may be missing or off. Next semester should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br />- Since this is a new feature, it may be buggy. Feel free to DM me (IG in extension popup) for any concerns<br />- You can view this at any time by going into the extension's menu.<br /><br /><b>Now, let's get started!</b>",
       audioStartTime: 52,
     },
     {
@@ -762,7 +762,7 @@ function Wrapped() {
           {!isInitialized && (
             <motion.div
               key="start-button"
-              className="absolute inset-x-0 top-[73%] z-50 flex items-center justify-center"
+              className="absolute inset-x-0 top-[81%] z-50 flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { duration: 1, delay: 3 } }}
               exit={{ opacity: 0, transition: { duration: 0 } }}
@@ -771,7 +771,7 @@ function Wrapped() {
                 onClick={initializeCarousel}
                 size="lg"
                 className="rounded-full h-12 w-12 flex items-center justify-center bg-[#BF5700] hover:bg-[#BF5700]/90"
-                aria-label="Start presentation"
+                aria-label="Start"
               >
                 <Play className="h-8 w-8" />
               </Button>
@@ -915,7 +915,7 @@ function Wrapped() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+                  className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:-translate-x-1"
                   onClick={prevSlide}
                 >
                   <ChevronLeft className="h-6 w-6" />
@@ -928,7 +928,7 @@ function Wrapped() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+                  className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:translate-x-1"
                   onClick={nextSlide}
                 >
                   <ChevronRight className="h-6 w-6" />
