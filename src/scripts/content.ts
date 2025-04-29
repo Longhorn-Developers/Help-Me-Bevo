@@ -758,4 +758,143 @@ function addDiv(overlayHTML: string) {
   document.body.appendChild(overlayElement);
 }
 
+// Load the preference and show the popup only if not hidden
+load("wrappedPopupVisible_S25", true, (visible: boolean) => {
+  if (visible) {
+    showWrappedPopup();
+  }
+});
+
+function showWrappedPopup() {
+  // inject styles
+  const style = document.createElement("style");
+  style.textContent = `
+    #wrapped-popup {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 16rem;
+      background-color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      border-radius: 0.5rem;
+      padding: 0.25rem 1rem;
+      transform: translateY(1rem);
+      opacity: 0;
+      transition: all 0.3s ease;
+      color: #000;
+      z-index: 99999;
+    }
+    @media (prefers-color-scheme: dark) {
+      #wrapped-popup {
+        background-color: #383838;
+        color: #fff;
+      }
+    }
+    #wrapped-popup.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    #wrapped-popup h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    #wrapped-popup .btn-close {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: inherit;
+    }
+    #wrapped-popup p {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    #wrapped-popup p .highlight {
+      font-weight: 700;
+      color: #c65900;
+    }
+    #wrapped-popup .btn-show {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background-color: #c65900;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    #wrapped-popup .btn-show:hover {
+      background-color: #c65900a0;
+    }
+    #wrapped-popup .btn-hide {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #71717a;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    #wrapped-popup .btn-hide:hover {
+      color: #333333;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // create popup
+  const popup = document.createElement("div");
+  popup.id = "wrapped-popup";
+  popup.innerHTML = `
+    <h2>
+      Hey there!
+      <button class="btn-close" aria-label="Close">&times;</button>
+    </h2>
+    <p>Your <span class="highlight">Help Me Bevo: Wrapped</span> video is ready! Let's take a trip down this semester's memory lane.</p>
+    <div style="display:flex; align-items:center;">
+      <button class="btn-show">Show me!</button>
+      <button class="btn-hide">Don't show again</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+
+  // trigger slide‐in
+  requestAnimationFrame(() => popup.classList.add("visible"));
+
+  // hide logic
+  function hide(goToWrapped = false) {
+    popup.classList.remove("visible");
+    setTimeout(() => {
+      if (goToWrapped) {
+        window.open(
+          chrome.runtime.getURL("../src/html/wrapped.html"),
+          "_blank"
+        );
+      }
+      popup.remove();
+      style.remove();
+    }, 300);
+  }
+
+  // button listeners
+  popup.querySelector(".btn-show")!.addEventListener("click", () => {
+    save("wrappedPopupVisible_S25", false);
+    hide(false);
+    hide(true);
+  });
+  popup.querySelector(".btn-hide")!.addEventListener("click", () => {
+    save("wrappedPopupVisible_S25", false);
+    hide(false);
+  });
+  popup
+    .querySelector(".btn-close")!
+    .addEventListener("click", () => hide(false));
+}
+
 console.log("content.js loaded");

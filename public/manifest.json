@@ -21,6 +21,16 @@
       "css": ["global.css"]
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/html/wrapped.html"],
+      "matches": [
+        "https://*.instructure.com/*",
+        "https://www.gradescope.com/*",
+        "https://classroom.google.com/*"
+      ]
+    }
+  ],
   "browser_specific_settings": {
     "gecko": {
       "id": "{aa86d078-cb8b-43cf-9b8f-55edb7afee52}"

@@ -1,5 +1,3 @@
-"use client";
-
 import "../global.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -12,7 +10,7 @@ import {
   Play,
   Pause,
   Volume2,
-  VolumeOff,
+  VibrateOffIcon as VolumeOff,
   Repeat,
   StepForward,
 } from "lucide-react";
@@ -100,6 +98,7 @@ function Wrapped() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isAutoplay, setIsAutoplay] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false); // New state for initial play button
 
   const slideDuration = 8.5;
 
@@ -201,16 +200,57 @@ function Wrapped() {
       videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
       textAnimation: "fadeIn",
       text: "Have a great summer break!",
-      subtitle:
-        "If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!",
+      subtitle: `If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!<br /><br />
+        <a
+          style="
+            font-weight: bold;
+            text-decoration: underline;
+            color: #c77d40;
+          "
+          href="https://chromewebstore.google.com/detail/help-me-bevo/igepffgmogjaehnlpgepliimadegcapd?authuser=1&hl=en"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Like the extension? Click here to leave a rating!
+        </a>`,
       audioStartTime: slideDuration * 11,
     },
   ]);
+
+  // Initialize the carousel after user interaction
+  const initializeCarousel = async () => {
+    setIsInitialized(true);
+
+    // Start playing the first slide
+    const currentVideo = videoRefs.current[0];
+    if (currentVideo) {
+      try {
+        await currentVideo.play();
+      } catch (e) {
+        console.error("Video play error:", e);
+      }
+    }
+
+    // Start playing audio
+    if (audioRef.current) {
+      try {
+        audioRef.current.currentTime = slides[0].audioStartTime;
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (e) {
+        console.error("Audio play error:", e);
+        setIsPlaying(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const loadStats = async () => {
       const personalStats = (await get("personalStats")) as any;
       const semester = personalStats.SPRING_2025;
+
+      // Track which slides to remove
+      const slidesToRemove: number[] = [];
 
       // get busiest day
       const busiestDay = semester.busiestDay;
@@ -230,7 +270,7 @@ function Wrapped() {
         "Friday",
         "Saturday",
       ];
-      const busiestDayIndex = parseInt(busiestDayKey, 10);
+      const busiestDayIndex = Number.parseInt(busiestDayKey, 10);
       const busiestDayName = dayNames[busiestDayIndex] ?? busiestDayKey;
 
       // get busiest hour
@@ -242,7 +282,7 @@ function Wrapped() {
       const [busiestHourKey] = busiestHourEntries.reduce((prev, curr) =>
         curr[1] > prev[1] ? curr : prev
       );
-      const hourNum = parseInt(busiestHourKey, 10);
+      const hourNum = Number.parseInt(busiestHourKey, 10);
       const period = hourNum >= 12 ? "PM" : "AM";
       const hour12 = hourNum % 12 === 0 ? 12 : hourNum % 12;
       const busiestHourLabel = `${hour12} ${period}`;
@@ -287,98 +327,110 @@ function Wrapped() {
         name: string;
         timeLeft: number;
       };
-      const cleanName = earliest.name
-        .replace(/[^\x20-\x7E]/g, "") // remove non-keyboard characters
-        .replace(/\n/g, "") // remove newlines
-        .trim(); // trim whitespace
 
-      const totalSeconds = earliest.timeLeft;
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
+      // Check if earliest assignment should be removed (timeLeft === -1)
+      if (earliest.timeLeft === -1) {
+        slidesToRemove.push(5); // Index of the earliest assignment slide
+      } else {
+        const cleanName = earliest.name
+          .replace(/[^\x20-\x7E]/g, "") // remove non-keyboard characters
+          .replace(/\n/g, "") // remove newlines
+          .trim(); // trim whitespace
 
-      const parts: string[] = [];
-      if (days > 0) parts.push(`${days}d`);
-      if (hours > 0) parts.push(`${hours}h`);
-      if (minutes > 0) parts.push(`${minutes}m`);
-      parts.push(`${seconds}s`);
+        const totalSeconds = earliest.timeLeft;
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
 
-      const timeLabel = parts.join(" ");
+        const parts: string[] = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0) parts.push(`${hours}h`);
+        if (minutes > 0) parts.push(`${minutes}m`);
+        parts.push(`${seconds}s`);
 
-      setSlides((prev) => {
-        const updated = [...prev];
-        updated[5] = {
-          ...updated[5],
-          text: `Procrastination? Never heard of it. Your earliest assignment was <b>${cleanName}</b>, submitted with <b>${timeLabel}</b> to spare!`,
-          subtitle: getSubtitle("earliestAssignment", totalSeconds / 60 / 60),
-        };
-        return updated;
-      });
+        const timeLabel = parts.join(" ");
+
+        setSlides((prev) => {
+          const updated = [...prev];
+          updated[5] = {
+            ...updated[5],
+            text: `Procrastination? Never heard of it. Your earliest assignment was <b>${cleanName}</b>, submitted with <b>${timeLabel}</b> to spare!`,
+            subtitle: getSubtitle("earliestAssignment", totalSeconds / 60 / 60),
+          };
+          return updated;
+        });
+      }
 
       // get most procrastinated assignment
       const procrastinated = semester.mostProcrastinatedAssignment as {
         name: string;
         timeLeft: number;
       };
-      // clean up the name
-      const cleanProcrastinatedName = procrastinated.name
-        .replace(/[^\x20-\x7E]/g, "")
-        .replace(/\n/g, "")
-        .trim();
 
-      const timeLeft = procrastinated.timeLeft;
-      if (timeLeft >= 0) {
-        // on‑time submission
-        const daysP = Math.floor(timeLeft / 86400);
-        const hoursP = Math.floor((timeLeft % 86400) / 3600);
-        const minsP = Math.floor((timeLeft % 3600) / 60);
-        const secsP = timeLeft % 60;
-        const partsP: string[] = [];
-        if (daysP > 0) partsP.push(`${daysP}d`);
-        if (hoursP > 0) partsP.push(`${hoursP}h`);
-        if (minsP > 0) partsP.push(`${minsP}m`);
-        partsP.push(`${secsP}s`);
-        const procrastTimeLabel = partsP.join(" ");
-
-        setSlides((prev) => {
-          const updated = [...prev];
-          updated[6] = {
-            ...updated[6],
-            text: `Procrastination happens sometimes. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted with <b>${procrastTimeLabel}</b> to spare!`,
-            subtitle: getSubtitle(
-              "mostProcrastinatedAssignment",
-              timeLeft / 60 / 60
-            ),
-          };
-          return updated;
-        });
+      // Check if procrastinated assignment should be removed (timeLeft === -1)
+      if (procrastinated.timeLeft === -1) {
+        slidesToRemove.push(6); // Index of the procrastinated assignment slide
       } else {
-        // late submission
-        const lateSec = Math.abs(timeLeft);
-        const daysL = Math.floor(lateSec / 86400);
-        const hoursL = Math.floor((lateSec % 86400) / 3600);
-        const minsL = Math.floor((lateSec % 3600) / 60);
-        const secsL = lateSec % 60;
-        const partsL: string[] = [];
-        if (daysL > 0) partsL.push(`${daysL}d`);
-        if (hoursL > 0) partsL.push(`${hoursL}h`);
-        if (minsL > 0) partsL.push(`${minsL}m`);
-        partsL.push(`${secsL}s`);
-        const lateTimeLabel = partsL.join(" ");
+        // clean up the name
+        const cleanProcrastinatedName = procrastinated.name
+          .replace(/[^\x20-\x7E]/g, "")
+          .replace(/\n/g, "")
+          .trim();
 
-        setSlides((prev) => {
-          const updated = [...prev];
-          updated[6] = {
-            ...updated[6],
-            text: `Late work happens to all of us. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted <b>${lateTimeLabel}</b> late!`,
-            subtitle: getSubtitle(
-              "mostProcrastinatedAssignment",
-              -lateSec / 60 / 60
-            ),
-          };
-          return updated;
-        });
+        const timeLeft = procrastinated.timeLeft;
+        if (timeLeft >= 0) {
+          // on‑time submission
+          const daysP = Math.floor(timeLeft / 86400);
+          const hoursP = Math.floor((timeLeft % 86400) / 3600);
+          const minsP = Math.floor((timeLeft % 3600) / 60);
+          const secsP = timeLeft % 60;
+          const partsP: string[] = [];
+          if (daysP > 0) partsP.push(`${daysP}d`);
+          if (hoursP > 0) partsP.push(`${hoursP}h`);
+          if (minsP > 0) partsP.push(`${minsP}m`);
+          partsP.push(`${secsP}s`);
+          const procrastTimeLabel = partsP.join(" ");
+
+          setSlides((prev) => {
+            const updated = [...prev];
+            updated[6] = {
+              ...updated[6],
+              text: `Procrastination happens sometimes. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted with <b>${procrastTimeLabel}</b> to spare!`,
+              subtitle: getSubtitle(
+                "mostProcrastinatedAssignment",
+                timeLeft / 60 / 60
+              ),
+            };
+            return updated;
+          });
+        } else {
+          // late submission
+          const lateSec = Math.abs(timeLeft);
+          const daysL = Math.floor(lateSec / 86400);
+          const hoursL = Math.floor((lateSec % 86400) / 3600);
+          const minsL = Math.floor((lateSec % 3600) / 60);
+          const secsL = lateSec % 60;
+          const partsL: string[] = [];
+          if (daysL > 0) partsL.push(`${daysL}d`);
+          if (hoursL > 0) partsL.push(`${hoursL}h`);
+          if (minsL > 0) partsL.push(`${minsL}m`);
+          partsL.push(`${secsL}s`);
+          const lateTimeLabel = partsL.join(" ");
+
+          setSlides((prev) => {
+            const updated = [...prev];
+            updated[6] = {
+              ...updated[6],
+              text: `Late work happens to all of us. Your most procrastinated assignment was <b>${cleanProcrastinatedName}</b>, submitted <b>${lateTimeLabel}</b> late!`,
+              subtitle: getSubtitle(
+                "mostProcrastinatedAssignment",
+                -lateSec / 60 / 60
+              ),
+            };
+            return updated;
+          });
+        }
       }
 
       // last minute submissions
@@ -427,7 +479,35 @@ function Wrapped() {
         };
         return updated;
       });
+
+      // Now remove slides and update IDs if needed
+      if (slidesToRemove.length > 0) {
+        setSlides((prev) => {
+          // Sort in descending order to remove from the end first
+          slidesToRemove.sort((a, b) => b - a);
+
+          // Create a copy of the slides
+          const updated = [...prev];
+
+          // Remove the slides
+          for (const index of slidesToRemove) {
+            updated.splice(index, 1);
+          }
+
+          // Update IDs and audioStartTime for all slides
+          return updated.map((slide, index) => {
+            return {
+              ...slide,
+              id: index + 1,
+              // Keep the first two slides' audio times as they are, adjust the rest
+              audioStartTime:
+                index <= 1 ? slide.audioStartTime : slideDuration * (index - 1), // Adjust audio start time based on new position
+            };
+          });
+        });
+      }
     };
+
     loadStats();
   }, []);
 
@@ -542,22 +622,25 @@ function Wrapped() {
 
   // Initialize when component mounts
   useEffect(() => {
-    // Initialize the first slide with autoplay
-    const initializeAudio = async () => {
-      if (audioRef.current) {
-        try {
-          audioRef.current.currentTime = slides[0].audioStartTime;
-          await audioRef.current.play();
-          setIsPlaying(true);
-        } catch (e) {
-          console.error("Audio autoplay error:", e);
-          setIsPlaying(false);
+    // Only initialize audio and video if isInitialized is true
+    if (isInitialized) {
+      // Initialize the first slide with autoplay
+      const initializeAudio = async () => {
+        if (audioRef.current) {
+          try {
+            audioRef.current.currentTime = slides[0].audioStartTime;
+            await audioRef.current.play();
+            setIsPlaying(true);
+          } catch (e) {
+            console.error("Audio autoplay error:", e);
+            setIsPlaying(false);
+          }
         }
-      }
-    };
+      };
 
-    goToSlide(0);
-    initializeAudio();
+      goToSlide(0);
+      initializeAudio();
+    }
 
     // Set up audio duration
     if (audioRef.current) {
@@ -579,10 +662,12 @@ function Wrapped() {
       if (audioRef.current) audioRef.current.pause();
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [isInitialized]); // Added isInitialized as a dependency
 
   // Update event listeners when currentSlide changes
   useEffect(() => {
+    if (!isInitialized) return; // Skip if not initialized
+
     const currentVideo = videoRefs.current[currentSlide];
     if (currentVideo) {
       // Add loop event listener to current video
@@ -600,10 +685,13 @@ function Wrapped() {
         currentVideo.removeEventListener("timeupdate", () => {});
       }
     };
-  }, [currentSlide]);
+  }, [currentSlide, isInitialized]);
 
   // Handle keyboard events
   const handleKeyDown = (event: KeyboardEvent) => {
+    // Only handle keyboard events after initialization
+    if (!isInitialized) return;
+
     console.log(event);
     if (
       event.code === "Space" ||
@@ -669,6 +757,28 @@ function Wrapped() {
         ref={containerRef}
         className="relative w-full max-w-sm mx-auto overflow-hidden rounded-lg aspect-[9/16] bg-black filter drop-shadow-[0_0_20px_rgba(0,0,0,0.85)]"
       >
+        {/* Initial Play Button Overlay */}
+        <AnimatePresence>
+          {!isInitialized && (
+            <motion.div
+              key="start-button"
+              className="absolute inset-x-0 top-[73%] z-50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 1, delay: 3 } }}
+              exit={{ opacity: 0, transition: { duration: 0 } }}
+            >
+              <Button
+                onClick={initializeCarousel}
+                size="lg"
+                className="rounded-full h-12 w-12 flex items-center justify-center bg-[#BF5700] hover:bg-[#BF5700]/90"
+                aria-label="Start presentation"
+              >
+                <Play className="h-8 w-8" />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Videos */}
         {slides.map((slide, index) => (
           <div
@@ -744,102 +854,107 @@ function Wrapped() {
           </div>
         ))}
 
-        {/* Play/Pause Button */}
-        <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-30">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-            onClick={togglePlayPause}
-            aria-label={isPlaying ? "Pause" : "Play"}
-            title={isPlaying ? "Pause playback" : "Play playback"}
-          >
-            {isPlaying ? (
-              <Pause className="h-5 w-5" />
-            ) : (
-              <Play className="h-5 w-5" />
-            )}
-          </Button>
+        {/* Only show controls after initialization */}
+        {isInitialized && (
+          <>
+            {/* Play/Pause Button */}
+            <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-30">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                onClick={togglePlayPause}
+                aria-label={isPlaying ? "Pause" : "Play"}
+                title={isPlaying ? "Pause playback" : "Play playback"}
+              >
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5" />
+                )}
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-            onClick={toggleMute}
-            aria-label={isMuted ? "Unmute" : "Mute"}
-            title={isMuted ? "Unmute audio" : "Mute audio"}
-          >
-            {isMuted ? (
-              <VolumeOff className="h-5 w-5" />
-            ) : (
-              <Volume2 className="h-5 w-5" />
-            )}
-          </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                onClick={toggleMute}
+                aria-label={isMuted ? "Unmute" : "Mute"}
+                title={isMuted ? "Unmute audio" : "Mute audio"}
+              >
+                {isMuted ? (
+                  <VolumeOff className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-            onClick={toggleAutoplay}
-            aria-label={isAutoplay ? "Disable Autoplay" : "Enable Autoplay"}
-            title={
-              isAutoplay
-                ? "Disable autoplay between slides"
-                : "Enable autoplay between slides"
-            }
-          >
-            {isAutoplay ? (
-              <StepForward className="h-5 w-5" />
-            ) : (
-              <Repeat className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                onClick={toggleAutoplay}
+                aria-label={isAutoplay ? "Disable Autoplay" : "Enable Autoplay"}
+                title={
+                  isAutoplay
+                    ? "Disable autoplay between slides"
+                    : "Enable autoplay between slides"
+                }
+              >
+                {isAutoplay ? (
+                  <StepForward className="h-5 w-5" />
+                ) : (
+                  <Repeat className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
 
-        {/* Navigation Controls */}
-        {currentSlide != 0 && (
-          <div className="absolute inset-y-0 left-2 flex items-center z-20">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
-              onClick={prevSlide}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-          </div>
+            {/* Navigation Controls */}
+            {currentSlide != 0 && (
+              <div className="absolute inset-y-0 left-2 flex items-center z-20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+                  onClick={prevSlide}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
+
+            {currentSlide != slides.length - 1 && (
+              <div className="absolute inset-y-0 right-2 flex items-center z-20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
+                  onClick={nextSlide}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
+
+            {/* Progress Indicators */}
+            <div className="absolute top-4 inset-x-4 flex gap-1 z-20">
+              {slides.map((_, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "h-1 flex-1 rounded-full transition-all duration-300",
+                    currentSlide === index
+                      ? "bg-white"
+                      : currentSlide > index
+                      ? "bg-white/70"
+                      : "bg-white/30"
+                  )}
+                  onClick={() => goToSlide(index)}
+                />
+              ))}
+            </div>
+          </>
         )}
-
-        {currentSlide != slides.length - 1 && (
-          <div className="absolute inset-y-0 right-2 flex items-center z-20">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full bg-black/30 text-white hover:bg-black/50"
-              onClick={nextSlide}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
-          </div>
-        )}
-
-        {/* Progress Indicators */}
-        <div className="absolute top-4 inset-x-4 flex gap-1 z-20">
-          {slides.map((_, index) => (
-            <div
-              key={index}
-              className={cn(
-                "h-1 flex-1 rounded-full transition-all duration-300",
-                currentSlide === index
-                  ? "bg-white"
-                  : currentSlide > index
-                  ? "bg-white/70"
-                  : "bg-white/30"
-              )}
-              onClick={() => goToSlide(index)}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
