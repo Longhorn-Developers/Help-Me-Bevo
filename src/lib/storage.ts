@@ -8,7 +8,7 @@ export function sendMessage(message: any): void {
       if (tab && tab.id !== undefined) {
         await chrome.tabs.sendMessage(tab.id, message);
       }
-    } catch (e) {
+    } catch {
       // Optionally, handle the error here
     }
   })();
@@ -47,7 +47,6 @@ function clamp(value: number, min: number, max: number): number {
  * @param value - The value to store (must be JSON-serializable).
  * @returns A promise that resolves when the value has been stored.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function write(key: string, value: any): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     chrome.storage.local.set({ [key]: value }, () => {
