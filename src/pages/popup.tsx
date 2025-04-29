@@ -57,11 +57,13 @@ export default function Popup() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   const [quote, setQuote] = useState("Hook 'em");
+  let ogQuote = "Hook 'em";
 
   useEffect(() => {
     (async () => {
       const _quote = await chrome.runtime.sendMessage("quote");
       setQuote(_quote || "Hook 'em");
+      ogQuote = _quote || "Hook 'em";
     })();
   }, []);
 
@@ -75,7 +77,7 @@ export default function Popup() {
         if (tab && tab.id !== undefined) {
           await chrome.tabs.sendMessage(tab.id, message);
         }
-      } catch (e) {
+      } catch {
         // Optionally, handle the error here
       }
     })();
@@ -162,9 +164,13 @@ export default function Popup() {
           <div className="flex items-center justify-center">
             <button
               id="toggle"
-              className={`vertical-center font-bold rounded-lg size-9 ${
-                settings.enabled ? "bg-green-400" : "bg-red-400"
-              } hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out`}
+              className={`
+                vertical-center font-bold rounded-lg size-9
+                ${settings.enabled ? "bg-green-400" : "bg-red-400"}
+                transform transition-all duration-200 ease-in-out
+                hover:scale-110 active:scale-95
+                hover:shadow-lg hover:shadow-white/25 shadow-none
+              `}
               onClick={() => changeSetting("enabled", !settings.enabled)}
             >
               {settings.enabled ? "ON" : "OFF"}
@@ -348,7 +354,7 @@ export default function Popup() {
               <div className="w-full">
                 <div className="font-medium mb-0.5">Made by:</div>
                 <a
-                  className="text-[#bf5700] font-medium"
+                  className="text-[#bf5700] !underline font-medium"
                   href="https://www.instagram.com/aidenn.johnson/"
                   target="_blank"
                 >
@@ -359,7 +365,7 @@ export default function Popup() {
               <div className="w-full">
                 <div className="font-medium mb-0.5">Designed by:</div>
                 <a
-                  className="text-[#bf5700] font-medium"
+                  className="text-[#bf5700] !underline font-medium"
                   href="https://www.instagram.com/ethan.lanting/"
                   target="_blank"
                 >
@@ -375,20 +381,45 @@ export default function Popup() {
 
               <div className="grid grid-rows-1 grid-cols-3 gap-y-2 gap-x-1 w-full">
                 <button
-                  id="statsbutton"
-                  className="font-bold w-full cursor-pointer px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+                  className="
+                  font-bold w-full cursor-pointer px-2 py-1.5 bg-[#bf5700]
+                  rounded-full transform transition-transform duration-200 ease-in-out
+                  hover:scale-105 hover:shadow-lg hover:shadow-white/25
+                  active:scale-95 active:shadow-sm
+                  "
                   onClick={() => setShowStats(true)}
                 >
                   Stats
                 </button>
                 <button
-                  id="extensionbutton"
-                  className="font-bold cursor-pointer col-span-2 px-2 py-1 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+                  className="
+                  font-bold cursor-pointer col-span-2 px-2 py-1 bg-[#bf5700]
+                  rounded-full transform transition-transform duration-200 ease-in-out
+                  hover:scale-105 hover:shadow-lg hover:shadow-white/25
+                  active:scale-95 active:shadow-sm
+                  "
                   onClick={() => setShowExtensions(true)}
                 >
                   More Extensions
                 </button>
               </div>
+
+              <button
+                className="
+                  font-bold cursor-pointer col-span-2 w-full px-2 py-1 bg-[#bf5700]
+                  rounded-full transform transition-transform duration-200 ease-in-out
+                  hover:scale-105 hover:shadow-lg hover:shadow-white/25
+                  active:scale-95 active:shadow-sm
+                "
+                onClick={() => {
+                  window.open(
+                    chrome.runtime.getURL("../src/html/wrapped.html"),
+                    "_blank"
+                  );
+                }}
+              >
+                View Wrapped
+              </button>
             </div>
           </div>
 
@@ -406,6 +437,12 @@ export default function Popup() {
               className="ml-2 w-[2.9rem] h-full"
               href="https://github.com/longhorn-Developers/"
               target="_blank"
+              onMouseEnter={() => {
+                setQuote("Longhorn Developers");
+              }}
+              onMouseLeave={() => {
+                setQuote(ogQuote);
+              }}
             >
               <img className="rounded-md" src={LHD} alt="Icon" id="lhd" />
             </a>
