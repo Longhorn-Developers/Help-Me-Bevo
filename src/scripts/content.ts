@@ -57,8 +57,8 @@ function injectVideo() {
   console.log("Injected video");
 }
 
-let eventButtons: HTMLElement[] = [];
-let blacklisted = ["confirm_unfavorite_course"];
+const eventButtons: HTMLElement[] = [];
+const blacklisted = ["confirm_unfavorite_course"];
 
 let enabled: boolean = true;
 let assignments: boolean = true;
@@ -97,7 +97,7 @@ let personalStats = {
   [SEMESTER]: getStatsFields(),
 };
 
-let stats = {
+const stats = {
   total: 0,
   assignments: 0,
   quizzes: 0,
@@ -150,11 +150,15 @@ load("other", true, function (value: boolean) {
 load("volume", null, function (value: number | null) {
   if (value == null) {
     value = volume;
+    console.log("Volume not set, using default value: " + volume);
     save("volume", volume);
   }
 
   if (value < 1) {
     value *= 100;
+    save("volume", Math.floor(value + 0.5));
+  } else if (value > 100) {
+    value = 50;
     save("volume", Math.floor(value + 0.5));
   }
 
@@ -301,8 +305,8 @@ observer.observe(bodyElement, config);
  */
 
 function changeValue(data: [string, string, boolean]) {
-  let variable = data[1];
-  let value = data[2];
+  const variable = data[1];
+  const value = data[2];
 
   switch (variable) {
     case "assignments":
@@ -419,7 +423,7 @@ async function displayBevo(type: string, skipAnalytics: boolean | null) {
   video!.pause();
 
   setPlaying(true, type);
-  video!.volume = volume / 100; // Have to set it like this instead of loading it into the HTML so it works
+  video!.volume = volume; // Have to set it like this instead of loading it into the HTML so it works
 
   if (!skipAnalytics) {
     logStatistics(type);
@@ -537,12 +541,13 @@ function getAssignmentName(type: string) {
   let titleText;
 
   switch (type) {
-    case "assignments":
+    case "assignments": {
       titleElement = document.querySelector('[data-testid="title"]');
       titleText = titleElement ? titleElement.textContent : null;
 
       return titleText;
-    case "quizzes":
+    }
+    case "quizzes": {
       // First element is an active open quiz, the seocnd one is after the submission when page refreshes
       titleElement =
         document.querySelector(".quiz-header h1") ||
@@ -550,14 +555,16 @@ function getAssignmentName(type: string) {
       titleText = titleElement ? titleElement.textContent : null;
 
       return titleText;
-    case "discussions":
+    }
+    case "discussions": {
       const breadcrumbs = document.querySelector("#breadcrumbs ul");
       const lastSpan = breadcrumbs!.querySelector("li:last-child span");
 
       titleText = lastSpan!.textContent!.trim();
 
       return titleText;
-    case "gradescope":
+    }
+    case "gradescope": {
       const h1Element = document.querySelector(
         "h1.submissionOutlineHeader--assignmentTitle"
       );
@@ -565,6 +572,7 @@ function getAssignmentName(type: string) {
       titleText = h1Element!.innerHTML.trim();
 
       return titleText;
+    }
     default:
       break;
   }
@@ -574,20 +582,22 @@ function getCourseName(type: string) {
   switch (type) {
     case "quizzes":
     case "discussions":
-    case "assignments":
+    case "assignments": {
       const courseElement = document.querySelector(
         'a[href^="/courses/"] span.ellipsible'
       );
       const courseText = courseElement?.textContent!.trim();
 
       return courseText;
-    case "gradescope":
+    }
+    case "gradescope": {
       const courseTitleElement = document.querySelector(
         "h1.courseHeader--title"
       );
       const courseTitle = courseTitleElement?.textContent!.trim();
 
       return courseTitle;
+    }
     default:
       return;
   }
@@ -599,7 +609,7 @@ function getDueDate(type: string) {
   let unixTimestampSeconds: number;
 
   switch (type) {
-    case "assignments":
+    case "assignments": {
       dueDateElement = document.querySelector(
         '[data-testid="due-date"]'
       ) as HTMLElement;
@@ -611,7 +621,8 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
 
       return unixTimestampSeconds;
-    case "quizzes":
+    }
+    case "quizzes": {
       dueDateElement = document.querySelector("span.due_at") as HTMLElement;
       const dueDateText: string = dueDateElement?.textContent!.trim() as string;
 
@@ -620,7 +631,8 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dueDateText).getTime() / 1000);
 
       return unixTimestampSeconds;
-    case "gradescope":
+    }
+    case "gradescope": {
       dueDateElement = document.querySelector(
         "div[data-react-class='AssignmentSubmissionViewer']"
       ) as HTMLElement;
@@ -636,6 +648,7 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
 
       return unixTimestampSeconds;
+    }
   }
 }
 
@@ -699,7 +712,7 @@ function waitForElm<T extends Element = HTMLElement>(
     if (element) {
       return resolve(element);
     }
-    const observer = new MutationObserver((_mutations) => {
+    const observer = new MutationObserver(() => {
       const elm = document.querySelector(selector) as T | null;
       if (elm) {
         observer.disconnect();
@@ -761,7 +774,18 @@ function addDiv(overlayHTML: string) {
 // Load the preference and show the popup only if not hidden
 load("wrappedPopupVisible_S25", true, (visible: boolean) => {
   if (visible) {
-    showWrappedPopup();
+    fetch("https://www.aidenjohnson.dev/api/help-me-bevo-fflags")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((flags) => {
+        // Hard code bypass for testing purposes
+        if (flags.Wrapped?.enabled || (volume == 0 && !themedAnims && !other)) {
+          showWrappedPopup();
+        }
+      })
+      .catch((err) => console.error("Error fetching feature flags:", err));
   }
 });
 
