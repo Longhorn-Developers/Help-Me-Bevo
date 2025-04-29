@@ -34,11 +34,25 @@ function getSubtitle(type: string, value: any) {
       if (value >= 0 && value <= 6) {
         return "What has you up so late at night?";
       } else if (value >= 7 && value <= 12) {
-        return "Early bird gets the worm!";
+        return "Early bird gets the worm";
       } else if (value >= 13 && value <= 18) {
-        return "Afternoon productivity is real";
+        return "Afternoon productivity >";
       } else if (value >= 19 && value <= 23) {
-        return "Night owl vibes";
+        return "W night owl";
+      }
+      break;
+    }
+    case "busiestDay": {
+      if (value == 0) {
+        return "Sunday scaries?";
+      } else if (value == 1) {
+        return "Everyone hates Mondays";
+      } else if (value == 3) {
+        return "Hump day is a productive day";
+      } else if (value == 5) {
+        return "Submit everything before the weekend so you can relax is smart";
+      } else if (value >= 6) {
+        return "Weekend warrior";
       }
       break;
     }
@@ -293,6 +307,7 @@ function Wrapped() {
         updated[2] = {
           ...updated[2],
           text: `Every day was a fight this semester. You submitted the most assignments on <b>${busiestDayName}!</b>`,
+          subtitle: getSubtitle("busiestDay", busiestDayIndex),
         };
         updated[3] = {
           ...updated[3],
