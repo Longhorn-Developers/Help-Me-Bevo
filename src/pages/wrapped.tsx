@@ -83,6 +83,7 @@ function getSubtitle(type: string, value: any) {
   }
 }
 
+const baseURL = "https://www.aidenjohnson.dev/Wrapped/";
 function Wrapped() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const currentSlideRef = useRef<number>(currentSlide);
@@ -105,7 +106,7 @@ function Wrapped() {
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
-      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
       textAnimation: "fadeIn",
       text: "Before we begin:",
       subtitle:
@@ -114,67 +115,67 @@ function Wrapped() {
     },
     {
       id: 2,
-      videoSrc: "/wrapped/Intro.mp4",
+      videoSrc: `${baseURL}/Intro.mp4`,
       textAnimation: "fadeIn",
       audioStartTime: 0,
     },
     {
       id: 3,
-      videoSrc: "/wrapped/DiamondBlack.mp4",
+      videoSrc: `${baseURL}/DiamondBlack.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 1,
     },
     {
       id: 4,
-      videoSrc: "/wrapped/DiamondOrange.mp4",
+      videoSrc: `${baseURL}/DiamondOrange.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 2,
     },
     {
       id: 5,
-      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 3,
     },
     {
       id: 6,
-      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 4,
     },
     {
       id: 7,
-      videoSrc: "/wrapped/VerticalDiamond.mp4",
+      videoSrc: `${baseURL}/VerticalDiamond.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 5,
     },
     {
       id: 8,
-      videoSrc: "/wrapped/DiamondBlack.mp4",
+      videoSrc: `${baseURL}/DiamondBlack.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 6,
     },
     {
       id: 9,
-      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 7,
     },
     {
       id: 10,
-      videoSrc: "/wrapped/RibbonOrangeVert.mp4",
+      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 8,
     },
     {
       id: 11,
-      videoSrc: "/wrapped/VerticalDiamond.mp4",
+      videoSrc: `${baseURL}/VerticalDiamond.mp4`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 9,
     },
     {
       id: 12,
-      videoSrc: "/wrapped/BlackOrangeRectangles.mp4",
+      videoSrc: `${baseURL}/BlackOrangeRectangles.mp4`,
       textAnimation: "slideUp",
       text: "Thanks for using <b>Help Me Bevo</b> this semester!",
       subtitle: `
@@ -197,7 +198,7 @@ function Wrapped() {
     },
     {
       id: 13,
-      videoSrc: "/wrapped/DoubleHorizontalRibbons.mp4",
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
       textAnimation: "fadeIn",
       text: "Have a great summer break!",
       subtitle: `If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!<br /><br />
@@ -692,7 +693,6 @@ function Wrapped() {
     // Only handle keyboard events after initialization
     if (!isInitialized) return;
 
-    console.log(event);
     if (
       event.code === "Space" ||
       event.key === " " ||
@@ -824,7 +824,7 @@ function Wrapped() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white text-center">
                   {/* Main Text */}
                   <motion.h2
-                    className="text-2xl font-medium drop-shadow-lg mb-3"
+                    className="text-2xl font-medium drop-shadow-lg mb-3 select-none"
                     initial={
                       textAnimations[
                         slide.textAnimation as keyof typeof textAnimations
@@ -841,7 +841,7 @@ function Wrapped() {
 
                   {slide.subtitle && (
                     <motion.p
-                      className="text-base font-normal text-white/90 max-w-xs drop-shadow-lg"
+                      className="text-base font-normal text-white/90 max-w-xs drop-shadow-lg select-none"
                       initial={subtitleAnimation.initial}
                       animate={subtitleAnimation.animate}
                       key={`subtitle-${slide.id}`}
@@ -865,7 +865,7 @@ function Wrapped() {
                 className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
                 onClick={togglePlayPause}
                 aria-label={isPlaying ? "Pause" : "Play"}
-                title={isPlaying ? "Pause playback" : "Play playback"}
+                title={isPlaying ? "[SPACE] Pause" : "[SPACE] Play"}
               >
                 {isPlaying ? (
                   <Pause className="h-5 w-5" />

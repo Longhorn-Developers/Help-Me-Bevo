@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist (old).zip
 dist.zip
 dist-ssr
 *.local
@@ -25,3 +26,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
