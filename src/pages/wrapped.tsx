@@ -99,6 +99,7 @@ function getSubtitle(type: string, value: any) {
 
 const baseURL = "https://www.aidenjohnson.dev/Wrapped/";
 function Wrapped() {
+  const [curPersonalStats, setPersonalStats] = useState<any>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const currentSlideRef = useRef<number>(currentSlide);
   useEffect(() => {
@@ -262,6 +263,15 @@ function Wrapped() {
   useEffect(() => {
     const loadStats = async () => {
       const personalStats = (await get("personalStats")) as any;
+      if (
+        !personalStats ||
+        !personalStats.SPRING_2025 ||
+        personalStats.SPRING_2025.busiestDay.length === 0
+      ) {
+        console.log("No personal stats found");
+        return;
+      }
+      setPersonalStats(personalStats);
       const semester = personalStats.SPRING_2025;
 
       // Track which slides to remove
@@ -767,210 +777,220 @@ function Wrapped() {
         onEnded={() => setIsPlaying(false)}
         className="hidden"
       />
+      {curPersonalStats ? (
+        <div
+          ref={containerRef}
+          className="relative w-full max-w-sm mx-auto overflow-hidden rounded-lg aspect-[9/16] bg-black filter drop-shadow-[0_0_20px_rgba(0,0,0,0.85)]"
+        >
+          {/* Initial Play Button Overlay */}
+          <AnimatePresence>
+            {!isInitialized && (
+              <motion.div
+                key="start-button"
+                className="absolute inset-x-0 top-[81%] z-50 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 1, delay: 3 } }}
+                exit={{ opacity: 0, transition: { duration: 0 } }}
+              >
+                <Button
+                  onClick={initializeCarousel}
+                  size="lg"
+                  className="rounded-full h-12 w-12 flex items-center justify-center bg-[#BF5700] hover:bg-[#BF5700]/90"
+                  aria-label="Start"
+                >
+                  <Play className="h-8 w-8" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      <div
-        ref={containerRef}
-        className="relative w-full max-w-sm mx-auto overflow-hidden rounded-lg aspect-[9/16] bg-black filter drop-shadow-[0_0_20px_rgba(0,0,0,0.85)]"
-      >
-        {/* Initial Play Button Overlay */}
-        <AnimatePresence>
-          {!isInitialized && (
-            <motion.div
-              key="start-button"
-              className="absolute inset-x-0 top-[81%] z-50 flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 1, delay: 3 } }}
-              exit={{ opacity: 0, transition: { duration: 0 } }}
+          {/* Videos */}
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={cn(
+                "absolute inset-0 w-full h-full transition-opacity duration-300 flex items-center justify-center ",
+                currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"
+              )}
             >
-              <Button
-                onClick={initializeCarousel}
-                size="lg"
-                className="rounded-full h-12 w-12 flex items-center justify-center bg-[#BF5700] hover:bg-[#BF5700]/90"
-                aria-label="Start"
-              >
-                <Play className="h-8 w-8" />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Videos */}
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={cn(
-              "absolute inset-0 w-full h-full transition-opacity duration-300 flex items-center justify-center ",
-              currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"
-            )}
-          >
-            <video
-              ref={(el) => {
-                videoRefs.current[index] = el;
-              }}
-              src={slide.videoSrc}
-              className="object-cover w-full h-full"
-              muted
-              playsInline
-              onEnded={() => {
-                if (isAutoplay) {
-                  if (index === slides.length - 1) {
-                    goToSlide(0);
+              <video
+                ref={(el) => {
+                  videoRefs.current[index] = el;
+                }}
+                src={slide.videoSrc}
+                className="object-cover w-full h-full"
+                muted
+                playsInline
+                onEnded={() => {
+                  if (isAutoplay) {
+                    if (index === slides.length - 1) {
+                      goToSlide(0);
+                    } else {
+                      nextSlide();
+                    }
                   } else {
-                    nextSlide();
-                  }
-                } else {
-                  const video = videoRefs.current[index];
-                  if (video) {
-                    video.currentTime = 0;
-                    video
-                      .play()
-                      .catch((e) => console.error("Video replay error:", e));
-                  }
-                  if (isPlaying) {
-                    resetAudioToSlideStart();
-                  }
-                }
-              }}
-            />
-
-            {/* Text Overlay - Centered vertically and horizontally */}
-            {currentSlide === index && (
-              <AnimatePresence>
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white text-center">
-                  {/* Main Text */}
-                  <motion.h2
-                    className="text-2xl font-medium drop-shadow-lg mb-3 select-none"
-                    initial={
-                      textAnimations[
-                        slide.textAnimation as keyof typeof textAnimations
-                      ].initial
+                    const video = videoRefs.current[index];
+                    if (video) {
+                      video.currentTime = 0;
+                      video
+                        .play()
+                        .catch((e) => console.error("Video replay error:", e));
                     }
-                    animate={
-                      textAnimations[
-                        slide.textAnimation as keyof typeof textAnimations
-                      ].animate
+                    if (isPlaying) {
+                      resetAudioToSlideStart();
                     }
-                    key={`text-${slide.id}`}
-                    dangerouslySetInnerHTML={{ __html: slide.text || "" }}
-                  />
+                  }
+                }}
+              />
 
-                  {slide.subtitle && (
-                    <motion.p
-                      className="text-base font-normal text-white/90 max-w-xs drop-shadow-lg select-none"
-                      initial={subtitleAnimation.initial}
-                      animate={subtitleAnimation.animate}
-                      key={`subtitle-${slide.id}`}
-                      dangerouslySetInnerHTML={{ __html: slide.subtitle || "" }}
+              {/* Text Overlay - Centered vertically and horizontally */}
+              {currentSlide === index && (
+                <AnimatePresence>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white text-center">
+                    {/* Main Text */}
+                    <motion.h2
+                      className="text-2xl font-medium drop-shadow-lg mb-3 select-none"
+                      initial={
+                        textAnimations[
+                          slide.textAnimation as keyof typeof textAnimations
+                        ].initial
+                      }
+                      animate={
+                        textAnimations[
+                          slide.textAnimation as keyof typeof textAnimations
+                        ].animate
+                      }
+                      key={`text-${slide.id}`}
+                      dangerouslySetInnerHTML={{ __html: slide.text || "" }}
                     />
+
+                    {slide.subtitle && (
+                      <motion.p
+                        className="text-base font-normal text-white/90 max-w-xs drop-shadow-lg select-none"
+                        initial={subtitleAnimation.initial}
+                        animate={subtitleAnimation.animate}
+                        key={`subtitle-${slide.id}`}
+                        dangerouslySetInnerHTML={{
+                          __html: slide.subtitle || "",
+                        }}
+                      />
+                    )}
+                  </div>
+                </AnimatePresence>
+              )}
+            </div>
+          ))}
+
+          {/* Only show controls after initialization */}
+          {isInitialized && (
+            <>
+              {/* Play/Pause Button */}
+              <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-30">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  onClick={togglePlayPause}
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                  title={isPlaying ? "[SPACE] Pause" : "[SPACE] Play"}
+                >
+                  {isPlaying ? (
+                    <Pause className="h-5 w-5" />
+                  ) : (
+                    <Play className="h-5 w-5" />
                   )}
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  onClick={toggleMute}
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  title={isMuted ? "Unmute audio" : "Mute audio"}
+                >
+                  {isMuted ? (
+                    <VolumeOff className="h-5 w-5" />
+                  ) : (
+                    <Volume2 className="h-5 w-5" />
+                  )}
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  onClick={toggleAutoplay}
+                  aria-label={
+                    isAutoplay ? "Disable Autoplay" : "Enable Autoplay"
+                  }
+                  title={
+                    isAutoplay
+                      ? "Disable autoplay between slides"
+                      : "Enable autoplay between slides"
+                  }
+                >
+                  {isAutoplay ? (
+                    <StepForward className="h-5 w-5" />
+                  ) : (
+                    <Repeat className="h-5 w-5" />
+                  )}
+                </Button>
+              </div>
+
+              {/* Navigation Controls */}
+              {currentSlide != 0 && (
+                <div className="absolute inset-y-0 left-2 flex items-center z-20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:-translate-x-1"
+                    onClick={prevSlide}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
                 </div>
-              </AnimatePresence>
-            )}
-          </div>
-        ))}
+              )}
 
-        {/* Only show controls after initialization */}
-        {isInitialized && (
-          <>
-            {/* Play/Pause Button */}
-            <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-30">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-                onClick={togglePlayPause}
-                aria-label={isPlaying ? "Pause" : "Play"}
-                title={isPlaying ? "[SPACE] Pause" : "[SPACE] Play"}
-              >
-                {isPlaying ? (
-                  <Pause className="h-5 w-5" />
-                ) : (
-                  <Play className="h-5 w-5" />
-                )}
-              </Button>
+              {currentSlide != slides.length - 1 && (
+                <div className="absolute inset-y-0 right-2 flex items-center z-20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:translate-x-1"
+                    onClick={nextSlide}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </div>
+              )}
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-                onClick={toggleMute}
-                aria-label={isMuted ? "Unmute" : "Mute"}
-                title={isMuted ? "Unmute audio" : "Mute audio"}
-              >
-                {isMuted ? (
-                  <VolumeOff className="h-5 w-5" />
-                ) : (
-                  <Volume2 className="h-5 w-5" />
-                )}
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
-                onClick={toggleAutoplay}
-                aria-label={isAutoplay ? "Disable Autoplay" : "Enable Autoplay"}
-                title={
-                  isAutoplay
-                    ? "Disable autoplay between slides"
-                    : "Enable autoplay between slides"
-                }
-              >
-                {isAutoplay ? (
-                  <StepForward className="h-5 w-5" />
-                ) : (
-                  <Repeat className="h-5 w-5" />
-                )}
-              </Button>
-            </div>
-
-            {/* Navigation Controls */}
-            {currentSlide != 0 && (
-              <div className="absolute inset-y-0 left-2 flex items-center z-20">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:-translate-x-1"
-                  onClick={prevSlide}
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </Button>
+              {/* Progress Indicators */}
+              <div className="absolute top-4 inset-x-4 flex gap-1 z-20">
+                {slides.map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "h-1 flex-1 rounded-full transition-all duration-300",
+                      currentSlide === index
+                        ? "bg-white"
+                        : currentSlide > index
+                        ? "bg-white/70"
+                        : "bg-white/30"
+                    )}
+                    onClick={() => goToSlide(index)}
+                  />
+                ))}
               </div>
-            )}
-
-            {currentSlide != slides.length - 1 && (
-              <div className="absolute inset-y-0 right-2 flex items-center z-20">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-white cursor-pointer bg-transparent transform transition-transform duration-200 ease-out hover:scale-110 hover:translate-x-1"
-                  onClick={nextSlide}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-              </div>
-            )}
-
-            {/* Progress Indicators */}
-            <div className="absolute top-4 inset-x-4 flex gap-1 z-20">
-              {slides.map((_, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "h-1 flex-1 rounded-full transition-all duration-300",
-                    currentSlide === index
-                      ? "bg-white"
-                      : currentSlide > index
-                      ? "bg-white/70"
-                      : "bg-white/30"
-                  )}
-                  onClick={() => goToSlide(index)}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      ) : (
+        <p className="text-white text-lg font-medium text-center">
+          Seems like you haven't submitted an assignment yet... try submitting
+          one and try again!
+        </p>
+      )}
     </div>
   );
 }
