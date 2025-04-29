@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,9 +12,9 @@ export default defineConfig({
       input: {
         popup: "index.html",
         landing: "src/html/landing.html",
+        wrapped: "src/html/wrapped.html",
         content: "src/scripts/content.ts",
         background: "src/scripts/background.ts",
-        script: "src/scripts/script.ts",
       },
       output: {
         // Customize output file names if needed
@@ -21,6 +22,11 @@ export default defineConfig({
         chunkFileNames: `[name].js`,
         assetFileNames: `[name].[ext]`,
       },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

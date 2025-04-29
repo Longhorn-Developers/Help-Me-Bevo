@@ -56,6 +56,24 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
     // Return true to indicate that we will send a response asynchronously
     return true;
+  } else if (request == "fflags") {
+    // We still need to use this pattern for Chrome message listeners
+    (async () => {
+      try {
+        const response = await fetch(
+          "https://www.aidenjohnson.dev/api/help-me-bevo-fflags"
+        );
+        const data = await response.json();
+
+        sendResponse(data);
+      } catch (err) {
+        console.error("Error fetching quotes:", err);
+        sendResponse("");
+      }
+    })();
+
+    // Return true to indicate that we will send a response asynchronously
+    return true;
   } else {
     send(request);
   }

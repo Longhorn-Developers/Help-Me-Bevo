@@ -1,13 +1,13 @@
 {
   "name": "Help Me Bevo",
-  "version": "3.1.1",
+  "version": "4.0.1",
   "description": "Tired of being demotivated to get assignments done?\n",
   "manifest_version": 3,
   "author": "Aiden Johnson",
   "action": {
     "default_popup": "index.html",
     "default_title": "Help Me Bevo",
-    "default_icon": "./icons/icon128.png"
+    "default_icon": "/icons/icon128.png"
   },
   "permissions": ["storage"],
   "content_scripts": [
@@ -21,6 +21,16 @@
       "css": ["global.css"]
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/html/wrapped.html"],
+      "matches": [
+        "https://*.instructure.com/*",
+        "https://www.gradescope.com/*",
+        "https://classroom.google.com/*"
+      ]
+    }
+  ],
   "browser_specific_settings": {
     "gecko": {
       "id": "{aa86d078-cb8b-43cf-9b8f-55edb7afee52}"
@@ -30,9 +40,9 @@
     "service_worker": "background.js"
   },
   "icons": {
-    "16": "./icons/icon16.png",
-    "32": "./icons/icon32.png",
-    "48": "./icons/icon48.png",
-    "128": "./icons/icon128.png"
+    "16": "/icons/icon16.png",
+    "32": "/icons/icon32.png",
+    "48": "/icons/icon48.png",
+    "128": "/icons/icon128.png"
   }
 }

@@ -1,5 +1,5 @@
 import "../global.css";
-import Bevo from "../../public/images/Bevo.png";
+import Bevo from "../images/Bevo.png";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "../global.css";

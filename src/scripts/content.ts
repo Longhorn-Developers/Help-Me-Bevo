@@ -3,13 +3,13 @@ const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
 const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
 const debug = false;
-let volume = 0.5;
+let volume = 50;
 const DEBUG_ASSIGNMENT_NAME = "";
 function generateOverlayHTML() {
   return `
 <div id="video-overlay">
   <h1 class="hidden" id="assignmentName" >${DEBUG_ASSIGNMENT_NAME}</h1>
-  <video id="video" volume="${volume}" style="width: 100%">
+  <video id="video" volume="${volume / 100}" style="width: 100%">
     <source src="${fullVideoURL}" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -57,8 +57,8 @@ function injectVideo() {
   console.log("Injected video");
 }
 
-let eventButtons: HTMLElement[] = [];
-let blacklisted = ["confirm_unfavorite_course"];
+const eventButtons: HTMLElement[] = [];
+const blacklisted = ["confirm_unfavorite_course"];
 
 let enabled: boolean = true;
 let assignments: boolean = true;
@@ -97,7 +97,7 @@ let personalStats = {
   [SEMESTER]: getStatsFields(),
 };
 
-let stats = {
+const stats = {
   total: 0,
   assignments: 0,
   quizzes: 0,
@@ -146,16 +146,21 @@ load("discussions", false, function (value: boolean) {
 load("other", true, function (value: boolean) {
   other = value;
 });
-// Should load 0-1
+
 load("volume", null, function (value: number | null) {
   if (value == null) {
     value = volume;
+    console.log("Volume not set, using default value: " + volume);
     save("volume", volume);
   }
 
-  console.log(value);
-
-  value = clamp(value, 0, 1);
+  if (value < 1) {
+    value *= 100;
+    save("volume", Math.floor(value + 0.5));
+  } else if (value > 100) {
+    value = 50;
+    save("volume", Math.floor(value + 0.5));
+  }
 
   updateVolume([null, value]);
 });
@@ -300,8 +305,8 @@ observer.observe(bodyElement, config);
  */
 
 function changeValue(data: [string, string, boolean]) {
-  let variable = data[1];
-  let value = data[2];
+  const variable = data[1];
+  const value = data[2];
 
   switch (variable) {
     case "assignments":
@@ -367,10 +372,6 @@ function isSubmitButton(
   }
 
   return false;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(value, max));
 }
 
 async function displayBevo(type: string, skipAnalytics: boolean | null) {
@@ -540,12 +541,13 @@ function getAssignmentName(type: string) {
   let titleText;
 
   switch (type) {
-    case "assignments":
+    case "assignments": {
       titleElement = document.querySelector('[data-testid="title"]');
       titleText = titleElement ? titleElement.textContent : null;
 
       return titleText;
-    case "quizzes":
+    }
+    case "quizzes": {
       // First element is an active open quiz, the seocnd one is after the submission when page refreshes
       titleElement =
         document.querySelector(".quiz-header h1") ||
@@ -553,14 +555,16 @@ function getAssignmentName(type: string) {
       titleText = titleElement ? titleElement.textContent : null;
 
       return titleText;
-    case "discussions":
+    }
+    case "discussions": {
       const breadcrumbs = document.querySelector("#breadcrumbs ul");
       const lastSpan = breadcrumbs!.querySelector("li:last-child span");
 
       titleText = lastSpan!.textContent!.trim();
 
       return titleText;
-    case "gradescope":
+    }
+    case "gradescope": {
       const h1Element = document.querySelector(
         "h1.submissionOutlineHeader--assignmentTitle"
       );
@@ -568,6 +572,7 @@ function getAssignmentName(type: string) {
       titleText = h1Element!.innerHTML.trim();
 
       return titleText;
+    }
     default:
       break;
   }
@@ -577,20 +582,22 @@ function getCourseName(type: string) {
   switch (type) {
     case "quizzes":
     case "discussions":
-    case "assignments":
+    case "assignments": {
       const courseElement = document.querySelector(
         'a[href^="/courses/"] span.ellipsible'
       );
       const courseText = courseElement?.textContent!.trim();
 
       return courseText;
-    case "gradescope":
+    }
+    case "gradescope": {
       const courseTitleElement = document.querySelector(
         "h1.courseHeader--title"
       );
       const courseTitle = courseTitleElement?.textContent!.trim();
 
       return courseTitle;
+    }
     default:
       return;
   }
@@ -602,7 +609,7 @@ function getDueDate(type: string) {
   let unixTimestampSeconds: number;
 
   switch (type) {
-    case "assignments":
+    case "assignments": {
       dueDateElement = document.querySelector(
         '[data-testid="due-date"]'
       ) as HTMLElement;
@@ -614,7 +621,8 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
 
       return unixTimestampSeconds;
-    case "quizzes":
+    }
+    case "quizzes": {
       dueDateElement = document.querySelector("span.due_at") as HTMLElement;
       const dueDateText: string = dueDateElement?.textContent!.trim() as string;
 
@@ -623,7 +631,8 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dueDateText).getTime() / 1000);
 
       return unixTimestampSeconds;
-    case "gradescope":
+    }
+    case "gradescope": {
       dueDateElement = document.querySelector(
         "div[data-react-class='AssignmentSubmissionViewer']"
       ) as HTMLElement;
@@ -639,13 +648,16 @@ function getDueDate(type: string) {
       unixTimestampSeconds = Math.floor(new Date(dateTime).getTime() / 1000);
 
       return unixTimestampSeconds;
+    }
   }
 }
 
 function updateVolume(value: [null, number]) {
-  volume = clamp(value[1], 0, 1);
+  console.log(value[1]);
 
-  if (video != null) video.volume = volume;
+  volume = value[1] / 100;
+
+  if (video != null) video.volume = value[1] / 100;
 }
 
 function toggle(value: [null, boolean]) {
@@ -700,7 +712,7 @@ function waitForElm<T extends Element = HTMLElement>(
     if (element) {
       return resolve(element);
     }
-    const observer = new MutationObserver((_mutations) => {
+    const observer = new MutationObserver(() => {
       const elm = document.querySelector(selector) as T | null;
       if (elm) {
         observer.disconnect();
@@ -717,10 +729,6 @@ function waitForElm<T extends Element = HTMLElement>(
 }
 
 function save(key: string, value: any) {
-  if (key == "volume" && value > 1) {
-    value = clamp(value / 100, 0, 1);
-  }
-
   chrome.storage.local.set({ [key]: value }).then(() => {
     if (debug) console.log("Saved " + key + ": " + value);
   });
@@ -732,6 +740,8 @@ function load(key: string, defaultValue: any, callback: Function) {
 
     if (value == null) {
       value = defaultValue;
+
+      save(key, value);
     }
 
     callback(value);
@@ -759,6 +769,156 @@ function addDiv(overlayHTML: string) {
   const overlayElement = document.createElement("div");
   overlayElement.innerHTML = innerHTML;
   document.body.appendChild(overlayElement);
+}
+
+// Load the preference and show the popup only if not hidden
+load("wrappedPopupVisible_S25", true, (visible: boolean) => {
+  if (visible) {
+    fetch("https://www.aidenjohnson.dev/api/help-me-bevo-fflags")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((flags) => {
+        // Hard code bypass for testing purposes
+        if (flags.Wrapped?.enabled || (volume == 0 && !themedAnims && !other)) {
+          showWrappedPopup();
+        }
+      })
+      .catch((err) => console.error("Error fetching feature flags:", err));
+  }
+});
+
+function showWrappedPopup() {
+  // inject styles
+  const style = document.createElement("style");
+  style.textContent = `
+    #wrapped-popup {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 16rem;
+      background-color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      border-radius: 0.5rem;
+      padding: 0.25rem 1rem;
+      transform: translateY(1rem);
+      opacity: 0;
+      transition: all 0.3s ease;
+      color: #000;
+      z-index: 99999;
+    }
+    @media (prefers-color-scheme: dark) {
+      #wrapped-popup {
+        background-color: #383838;
+        color: #fff;
+      }
+    }
+    #wrapped-popup.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    #wrapped-popup h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    #wrapped-popup .btn-close {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: inherit;
+    }
+    #wrapped-popup p {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    #wrapped-popup p .highlight {
+      font-weight: 700;
+      color: #c65900;
+    }
+    #wrapped-popup .btn-show {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background-color: #c65900;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    #wrapped-popup .btn-show:hover {
+      background-color: #c65900a0;
+    }
+    #wrapped-popup .btn-hide {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #71717a;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    #wrapped-popup .btn-hide:hover {
+      color: #333333;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // create popup
+  const popup = document.createElement("div");
+  popup.id = "wrapped-popup";
+  popup.innerHTML = `
+    <h2>
+      Hey there!
+      <button class="btn-close" aria-label="Close">&times;</button>
+    </h2>
+    <p>Your <span class="highlight">Help Me Bevo: Wrapped</span> video is ready! Let's take a trip down this semester's memory lane.</p>
+    <div style="display:flex; align-items:center;">
+      <button class="btn-show">Show me!</button>
+      <button class="btn-hide">Don't show again</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+
+  // trigger slide‐in
+  requestAnimationFrame(() => popup.classList.add("visible"));
+
+  // hide logic
+  function hide(goToWrapped = false) {
+    popup.classList.remove("visible");
+    setTimeout(() => {
+      if (goToWrapped) {
+        window.open(
+          chrome.runtime.getURL("../src/html/wrapped.html"),
+          "_blank"
+        );
+      }
+      popup.remove();
+      style.remove();
+    }, 300);
+  }
+
+  // button listeners
+  popup.querySelector(".btn-show")!.addEventListener("click", () => {
+    save("wrappedPopupVisible_S25", false);
+    hide(false);
+    hide(true);
+  });
+  popup.querySelector(".btn-hide")!.addEventListener("click", () => {
+    save("wrappedPopupVisible_S25", false);
+    hide(false);
+  });
+  popup
+    .querySelector(".btn-close")!
+    .addEventListener("click", () => hide(false));
 }
 
 console.log("content.js loaded");
