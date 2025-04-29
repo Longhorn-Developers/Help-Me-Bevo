@@ -417,6 +417,7 @@ export default function Popup() {
                   active:scale-95 active:shadow-sm
                 "
                   onClick={() => {
+                    chrome.runtime.sendMessage("wrappedview");
                     window.open(
                       chrome.runtime.getURL("../src/html/wrapped.html"),
                       "_blank"

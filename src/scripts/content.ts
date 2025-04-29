@@ -908,6 +908,7 @@ function showWrappedPopup() {
 
   // button listeners
   popup.querySelector(".btn-show")!.addEventListener("click", () => {
+    analyticSend("wrappedshow");
     save("wrappedPopupVisible_S25", false);
     hide(false);
     hide(true);

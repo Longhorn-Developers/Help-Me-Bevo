@@ -537,6 +537,10 @@ function Wrapped() {
     loadStats();
   }, []);
 
+  useEffect(() => {
+    chrome.runtime.sendMessage("wrappedland");
+  }, []);
+
   const audioSrc = "/wrapped/Song.mp3";
 
   // Animation variants
