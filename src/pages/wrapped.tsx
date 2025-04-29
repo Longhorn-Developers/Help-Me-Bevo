@@ -266,7 +266,10 @@ function Wrapped() {
       if (
         !personalStats ||
         !personalStats.SPRING_2025 ||
-        personalStats.SPRING_2025.busiestDay.length === 0
+        !personalStats.SPRING_2025.busiestDay ||
+        !personalStats.SPRING_2025.busiestHour ||
+        Object.keys(personalStats.SPRING_2025.busiestDay).length === 0 ||
+        Object.keys(personalStats.SPRING_2025.busiestHour).length === 0
       ) {
         console.log("No personal stats found");
         return;
@@ -332,20 +335,25 @@ function Wrapped() {
       const courseEntries = Object.entries(courses).filter(
         ([name]) => name !== "undefined"
       ) as [string, number][];
-      const [topCourse, topCount] = courseEntries.length
-        ? courseEntries.reduce((prev, curr) =>
-            curr[1] > prev[1] ? curr : prev
-          )
-        : ["", 0];
 
-      setSlides((prev) => {
-        const updated = [...prev];
-        updated[4] = {
-          ...updated[4],
-          text: `Some classes can be a piece of work. Your most submitted course was <b>${topCourse}</b> with <b>${topCount}</b> submissions!`,
-        };
-        return updated;
-      });
+      if (courseEntries.length === 0) {
+        // No courses to show, mark this slide for removal
+        slidesToRemove.push(4);
+      } else {
+        // Find top course and update slide
+        const [topCourse, topCount] = courseEntries.reduce((prev, curr) =>
+          curr[1] > prev[1] ? curr : prev
+        );
+
+        setSlides((prev) => {
+          const updated = [...prev];
+          updated[4] = {
+            ...updated[4],
+            text: `Some classes can be a piece of work. Your most submitted course was <b>${topCourse}</b> with <b>${topCount}</b> submissions!`,
+          };
+          return updated;
+        });
+      }
 
       // get earliest submission. object formatted as { name: string, timeLeft: number (in seconds) }
       // get earliest submission
