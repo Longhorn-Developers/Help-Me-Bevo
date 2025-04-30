@@ -995,8 +995,8 @@ function Wrapped() {
         </div>
       ) : (
         <p className="text-white text-lg font-medium text-center">
-          Seems like you haven't submitted an assignment yet... try submitting
-          one and try again!
+          Seems like you haven't submitted an assignment yet. Submit one and use
+          the extension menu to come back!
         </p>
       )}
     </div>
