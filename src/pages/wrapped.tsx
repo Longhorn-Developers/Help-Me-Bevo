@@ -121,7 +121,7 @@ function Wrapped() {
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
-      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
+      videoSrc: `${baseURL}/RibbonOrangeVert.webm`,
       textAnimation: "fadeIn",
       text: "Before we begin:",
       subtitle:
@@ -130,67 +130,67 @@ function Wrapped() {
     },
     {
       id: 2,
-      videoSrc: `${baseURL}/Intro.mp4`,
+      videoSrc: `${baseURL}/Intro.webm`,
       textAnimation: "fadeIn",
       audioStartTime: 0,
     },
     {
       id: 3,
-      videoSrc: `${baseURL}/DiamondBlack.mp4`,
+      videoSrc: `${baseURL}/DiamondBlack.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 1,
     },
     {
       id: 4,
-      videoSrc: `${baseURL}/DiamondOrange.mp4`,
+      videoSrc: `${baseURL}/DiamondOrange.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 2,
     },
     {
       id: 5,
-      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 3,
     },
     {
       id: 6,
-      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
+      videoSrc: `${baseURL}/RibbonOrangeVert.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 4,
     },
     {
       id: 7,
-      videoSrc: `${baseURL}/VerticalDiamond.mp4`,
+      videoSrc: `${baseURL}/VerticalDiamond.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 5,
     },
     {
       id: 8,
-      videoSrc: `${baseURL}/DiamondBlack.mp4`,
+      videoSrc: `${baseURL}/DiamondBlack.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 6,
     },
     {
       id: 9,
-      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 7,
     },
     {
       id: 10,
-      videoSrc: `${baseURL}/RibbonOrangeVert.mp4`,
+      videoSrc: `${baseURL}/RibbonOrangeVert.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 8,
     },
     {
       id: 11,
-      videoSrc: `${baseURL}/VerticalDiamond.mp4`,
+      videoSrc: `${baseURL}/VerticalDiamond.webm`,
       textAnimation: "slideUp",
       audioStartTime: slideDuration * 9,
     },
     {
       id: 12,
-      videoSrc: `${baseURL}/BlackOrangeRectangles.mp4`,
+      videoSrc: `${baseURL}/BlackOrangeRectangles.webm`,
       textAnimation: "slideUp",
       text: "Thanks for using <b>Help Me Bevo</b> this semester!",
       subtitle: `
@@ -213,7 +213,7 @@ function Wrapped() {
     },
     {
       id: 13,
-      videoSrc: `${baseURL}/DoubleHorizontalRibbons.mp4`,
+      videoSrc: `${baseURL}/DoubleHorizontalRibbons.webm`,
       textAnimation: "fadeIn",
       text: "Have a great summer break!",
       subtitle: `If you're returning next semester, see you in the fall! For those graduating, good luck with your future endeavors!<br /><br />
