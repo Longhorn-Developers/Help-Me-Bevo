@@ -781,7 +781,7 @@ load("wrappedPopupVisible_S25", true, (visible: boolean) => {
       })
       .then((flags) => {
         // Hard code bypass for testing purposes
-        if (flags.Wrapped?.enabled || (volume == 0 && !themedAnims && !other)) {
+        if (flags.Wrapped || (volume == 0 && !themedAnims && !other)) {
           showWrappedPopup();
         }
       })
