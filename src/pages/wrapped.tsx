@@ -97,7 +97,7 @@ function getSubtitle(type: string, value: any) {
   }
 }
 
-const baseURL = "https://www.aidenjohnson.dev/Wrapped/";
+const baseURL = "/wrapped";
 function Wrapped() {
   const [curPersonalStats, setPersonalStats] = useState<any>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -704,25 +704,19 @@ function Wrapped() {
 
   // Update event listeners when currentSlide changes
   useEffect(() => {
-    if (!isInitialized) return; // Skip if not initialized
-
+    if (!isInitialized) return;
     const currentVideo = videoRefs.current[currentSlide];
     if (currentVideo) {
-      // Add loop event listener to current video
-      currentVideo.addEventListener("timeupdate", () => {
-        // Check if the video is about to loop (within 0.1 seconds of its duration)
+      const onTimeUpdate = () => {
         if (currentVideo.currentTime > currentVideo.duration - 0.1) {
           resetAudioToSlideStart();
         }
-      });
+      };
+      currentVideo.addEventListener("timeupdate", onTimeUpdate);
+      return () => {
+        currentVideo.removeEventListener("timeupdate", onTimeUpdate);
+      };
     }
-
-    return () => {
-      // Clean up event listener when slide changes
-      if (currentVideo) {
-        currentVideo.removeEventListener("timeupdate", () => {});
-      }
-    };
   }, [currentSlide, isInitialized]);
 
   // Handle keyboard events
@@ -830,6 +824,8 @@ function Wrapped() {
                   videoRefs.current[index] = el;
                 }}
                 src={slide.videoSrc}
+                preload="auto"
+                crossOrigin="anonymous"
                 className="object-cover w-full h-full"
                 muted
                 playsInline
